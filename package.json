@@ -1,0 +1,11 @@
+{
+  "name": "companygpt-library",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate.mjs"
+  },
+  "devDependencies": {
+    "yaml": "^2.8.1"
+  }
+}
