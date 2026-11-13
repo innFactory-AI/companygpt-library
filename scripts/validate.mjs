@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // Checks the repo layout before the docs build or companyADMIN Library Sync ever sees it.
 //
-//   skills/<locale>-<id>/SKILL.md      name == folder, locale prefix, both locales, listed in catalog.json
-//   pages/<locale>/<category>/<id>.md  one docs wrapper per catalog entry and locale
-//   agents/<locale>-<slug>.yaml        unique ids, skills/subagents resolve within the same locale
-//   admin/model-labels/<locale>.yaml   same model list in every locale
+//   skills/<category>/<locale>-<id>/SKILL.md   name == folder, locale prefix, both locales, listed under <category>
+//   pages/<category>/<id>.<locale>.md          one docs wrapper per catalog entry and locale
+//   agents/<locale>-<slug>.yaml                unique ids, skills/subagents resolve within the same locale
+//   admin/model-labels/<locale>.yaml           same model list in every locale
 //
 // Usage: npm run validate
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -48,33 +48,38 @@ for (const L of LOCALES) {
 	for (const key of ['title', 'description', 'intro']) if (!catalog.index?.[L]?.[key]) fail(`catalog.json: index.${L}.${key} missing`);
 }
 
-// skills/
+// skills/<category>/
 const skillNames = new Set();
-for (const folder of dirs('skills')) {
-	const rel = `skills/${folder}/SKILL.md`;
-	const m = folder.match(/^([a-z]{2})-(.+)$/);
-	if (!m || !LOCALES.includes(m[1])) {
-		fail(`skills/${folder}: folder must be <${LOCALES.join('|')}>-<id>`);
-		continue;
+const categories = new Set(catalog.categories.map((c) => c.id));
+for (const cat of dirs('skills')) {
+	if (!categories.has(cat)) fail(`skills/${cat}: not a category in catalog.json`);
+	for (const folder of dirs(`skills/${cat}`)) {
+		const rel = `skills/${cat}/${folder}/SKILL.md`;
+		const m = folder.match(/^([a-z]{2})-(.+)$/);
+		if (!m || !LOCALES.includes(m[1])) {
+			fail(`skills/${cat}/${folder}: folder must be <${LOCALES.join('|')}>-<id>`);
+			continue;
+		}
+		if (!existsSync(join(root, rel))) {
+			fail(`${rel}: missing`);
+			continue;
+		}
+		const [, L, id] = m;
+		const fm = frontmatter(rel);
+		if (fm.name !== folder) fail(`${rel}: name must be "${folder}" (is "${fm.name}")`);
+		if (!NAME_RE.test(folder) || folder.length > 64) fail(`${rel}: name must match ${NAME_RE} and have at most 64 characters`);
+		if (!fm.description) fail(`${rel}: frontmatter needs description`);
+		else if (String(fm.description).length > 1024) fail(`${rel}: description longer than 1024 characters`);
+		if (read(rel).length > 100_000) fail(`${rel}: longer than 100,000 characters`);
+		if (listed.get(id) !== cat) fail(`skills/${cat}/${folder}: ${id} is not listed under ${cat} in catalog.json`);
+		if (skillNames.has(folder)) fail(`skills/${cat}/${folder}: name ${folder} exists twice`);
+		skillNames.add(folder);
 	}
-	if (!existsSync(join(root, rel))) {
-		fail(`${rel}: missing`);
-		continue;
-	}
-	const [, L, id] = m;
-	const fm = frontmatter(rel);
-	if (fm.name !== folder) fail(`${rel}: name must be "${folder}" (is "${fm.name}")`);
-	if (!NAME_RE.test(folder) || folder.length > 64) fail(`${rel}: name must match ${NAME_RE} and have at most 64 characters`);
-	if (!fm.description) fail(`${rel}: frontmatter needs description`);
-	else if (String(fm.description).length > 1024) fail(`${rel}: description longer than 1024 characters`);
-	if (read(rel).length > 100_000) fail(`${rel}: longer than 100,000 characters`);
-	if (!listed.has(id)) fail(`skills/${folder}: ${id} is not listed in catalog.json`);
-	skillNames.add(folder);
 }
 for (const [id, cat] of listed) {
 	for (const L of LOCALES) {
-		if (!skillNames.has(`${L}-${id}`)) fail(`skills/${L}-${id}/SKILL.md: missing (listed in catalog.json)`);
-		const page = `pages/${L}/${cat}/${id}.md`;
+		if (!existsSync(join(root, 'skills', cat, `${L}-${id}`, 'SKILL.md'))) fail(`skills/${cat}/${L}-${id}/SKILL.md: missing (listed in catalog.json)`);
+		const page = `pages/${cat}/${id}.${L}.md`;
 		if (!existsSync(join(root, page))) {
 			fail(`${page}: missing`);
 			continue;
@@ -83,11 +88,11 @@ for (const [id, cat] of listed) {
 		for (const key of ['title', 'description', 'label']) if (!fm[key]) fail(`${page}: frontmatter needs ${key}`);
 	}
 }
-for (const L of LOCALES) {
-	for (const cat of dirs(`pages/${L}`)) {
-		for (const f of readdirSync(join(root, 'pages', L, cat)).filter((n) => n.endsWith('.md'))) {
-			if (listed.get(f.slice(0, -3)) !== cat) fail(`pages/${L}/${cat}/${f}: not listed under ${cat} in catalog.json`);
-		}
+for (const cat of dirs('pages')) {
+	for (const f of readdirSync(join(root, 'pages', cat)).filter((n) => n.endsWith('.md'))) {
+		const m = f.match(/^(.+)\.([a-z]{2})\.md$/);
+		if (!m || !LOCALES.includes(m[2])) fail(`pages/${cat}/${f}: file must be <id>.<${LOCALES.join('|')}>.md`);
+		else if (listed.get(m[1]) !== cat) fail(`pages/${cat}/${f}: not listed under ${cat} in catalog.json`);
 	}
 }
 
