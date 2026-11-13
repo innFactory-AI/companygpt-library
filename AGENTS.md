@@ -13,18 +13,20 @@ not be installed side by side.
 ## Layout
 
 ```text
-catalog.json                          # skill categories, order (by <id>), index texts (DE/EN)
-skills/<locale>-<id>/SKILL.md         # the skill: what users upload in companyGPT under "Skills"
-skills/<locale>-<id>/references/…     # optional bundled files (Markdown recipes; optionally scripts/…)
-pages/<locale>/<category>/<id>.md     # docs wrapper: title, description, sidebar label, intro
-agents/<locale>-<slug>.yaml           # ready-made companyGPT agent exports
-admin/model-labels/<locale>.yaml      # curated model labels (LibreChat modelSpecs), README.md explains them
-scripts/validate.mjs                  # `npm run validate`, runs in CI
+catalog.json                                  # skill categories, order (by <id>), index texts (DE/EN)
+skills/<category>/<locale>-<id>/SKILL.md      # the skill: what users upload in companyGPT under "Skills"
+skills/<category>/<locale>-<id>/references/…  # optional bundled files (Markdown recipes; optionally scripts/…)
+pages/<category>/<id>.<locale>.md             # docs wrapper: title, description, sidebar label, intro
+agents/<locale>-<slug>.yaml                   # ready-made companyGPT agent exports
+admin/model-labels/<locale>.yaml              # curated model labels (LibreChat modelSpecs), README.md explains them
+scripts/validate.mjs                          # `npm run validate`, runs in CI
 ```
 
 - `<locale>` is `de` or `en`. **The locale is part of every name**, so both languages can live in one companyGPT:
   skill `de-excel` / `en-excel`, agent id `agent_de_demogpt` / `agent_en_demogpt`. Every skill exists in both
-  locales with the same `<id>`.
+  locales with the same `<id>`, in the same `<category>` folder.
+- `<category>` groups skills by domain (`files`, `sales`, …). Library Sync finds skills at any depth, so the category
+  is not part of the name; moving a skill to another category keeps its identity (the docs URL changes, though).
 - `<id>`: English kebab-case, no `-skill` suffix. `catalog.json` lists skills by `<id>`, and the docs URL is
   `/<locale>/tutorials/skills/<category>/<id>`. Don't rename an `<id>` once it is live: the skill name is the
   identity in Library Sync (a rename deletes and re-creates the skill in every tenant, agents lose the reference),
@@ -36,7 +38,7 @@ scripts/validate.mjs                  # `npm run validate`, runs in CI
   bundled files with the built-in `read_file` tool (`<name>/references/x.md`, works without code execution); with
   code execution they are also copied read-only to `/mnt/data/skills/<name>/…` in the sandbox. A skill pasted or
   uploaded as a single `SKILL.md` has no bundled files.
-- `catalog.json` lists every category (`id` = docs URL segment and folder under `pages/<locale>/`, `label.de`/
+- `catalog.json` lists every category (`id` = folder under `skills/` and `pages/`, docs URL segment, `label.de`/
   `label.en` = sidebar group and index heading) and its skills in display order, plus the title, description and
   intro of the skills index page. A skill folder that is not in `catalog.json` fails validation, and so does a
   catalog entry without its skill and page in both locales.
@@ -61,7 +63,7 @@ description: One or two sentences; LibreChat uses it to decide when to load the 
   ```` ``` ```` blocks are fine.
 - Cross-references to other skills (`**de-powerpoint**`, `de-templates/references/…`) use the same locale prefix.
 
-### pages/<locale>/<category>/<id>.md
+### pages/<category>/<id>.<locale>.md
 
 ```markdown
 ---
