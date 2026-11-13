@@ -3,12 +3,12 @@
     "de": {
       "title": "Skills",
       "description": "Vorgefertigte Agenten-Skills für companyGPT",
-      "intro": "Du kannst die vorgefertigten Skills für Agenten verwenden, um mit den companyGPT-Tools zu arbeiten. Jeden Skill kannst du herunterladen und in companyGPT unter **Skills** hochladen. Die Skills liegen auch im öffentlichen Repository [company-ai-stack-skills](https://github.com/innFactory-AI/company-ai-stack-skills)."
+      "intro": "Du kannst die vorgefertigten Skills für Agenten verwenden, um mit den companyGPT-Tools zu arbeiten. Jeden Skill kannst du herunterladen und in companyGPT unter **Skills** hochladen. Die Skills liegen auch im öffentlichen Repository [companygpt-library](https://github.com/innFactory-AI/companygpt-library)."
     },
     "en": {
       "title": "Skills",
       "description": "Ready-made agent skills for companyGPT",
-      "intro": "Use these ready-made agent skills to work with the companyGPT tools. Download any skill and upload it in companyGPT under **Skills**. All skills are also available in the public repository [company-ai-stack-skills](https://github.com/innFactory-AI/company-ai-stack-skills)."
+      "intro": "Use these ready-made agent skills to work with the companyGPT tools. Download any skill and upload it in companyGPT under **Skills**. All skills are also available in the public repository [companygpt-library](https://github.com/innFactory-AI/companygpt-library)."
     }
   },
   "categories": [
@@ -19,8 +19,8 @@
         "en": "General"
       },
       "skills": [
-        "tool-search-skill",
-        "file-routing-skill"
+        "tool-search",
+        "file-routing"
       ]
     },
     {
@@ -30,8 +30,8 @@
         "en": "companyRAG"
       },
       "skills": [
-        "ai-search-skill",
-        "dataset-skill"
+        "ai-search",
+        "dataset"
       ]
     },
     {
@@ -41,7 +41,7 @@
         "en": "companyLEARN"
       },
       "skills": [
-        "course-authoring-skill"
+        "course-authoring"
       ]
     },
     {
@@ -51,16 +51,16 @@
         "en": "companyFILES"
       },
       "skills": [
-        "charts-diagram-skill",
-        "convert-skill",
-        "excel-skill",
-        "file-management-skill",
-        "pdf-skill",
-        "powerpoint-skill",
-        "settings-ui-skill",
-        "templates-skill",
-        "word-odt-skill",
-        "cad-bim-skill"
+        "charts-diagram",
+        "convert",
+        "excel",
+        "file-management",
+        "pdf",
+        "powerpoint",
+        "settings-ui",
+        "templates",
+        "word-odt",
+        "cad-bim"
       ]
     },
     {
@@ -70,12 +70,12 @@
         "en": "Customer Success"
       },
       "skills": [
-        "onboarding-plan-skill",
-        "qbr-builder-skill",
-        "customer-health-skill",
-        "escalation-brief-skill",
-        "renewal-prep-skill",
-        "success-plan-skill"
+        "onboarding-plan",
+        "qbr-builder",
+        "customer-health",
+        "escalation-brief",
+        "renewal-prep",
+        "success-plan"
       ]
     },
     {
@@ -85,15 +85,15 @@
         "en": "Engineering"
       },
       "skills": [
-        "deployment-prep-skill",
-        "code-review-skill",
-        "standup-skill",
-        "tech-debt-skill",
-        "debugging-skill",
-        "tech-docs-skill",
-        "architecture-design-skill",
-        "postmortem-skill",
-        "test-planning-skill"
+        "deployment-prep",
+        "code-review",
+        "standup",
+        "tech-debt",
+        "debugging",
+        "tech-docs",
+        "architecture-design",
+        "postmortem",
+        "test-planning"
       ]
     },
     {
@@ -103,12 +103,12 @@
         "en": "Human Resources"
       },
       "skills": [
-        "interview-guide-skill",
-        "performance-review-skill",
-        "employee-onboarding-skill",
-        "learning-plan-skill",
-        "compensation-skill",
-        "job-description-skill"
+        "interview-guide",
+        "performance-review",
+        "employee-onboarding",
+        "learning-plan",
+        "compensation",
+        "job-description"
       ]
     },
     {
@@ -118,12 +118,12 @@
         "en": "IT Knowledge Management"
       },
       "skills": [
-        "change-request-skill",
-        "security-assessment-skill",
-        "vendor-assessment-skill",
-        "it-docs-skill",
-        "incident-response-skill",
-        "knowledge-article-skill"
+        "change-request",
+        "security-assessment",
+        "vendor-assessment",
+        "it-docs",
+        "incident-response",
+        "knowledge-article"
       ]
     },
     {
@@ -133,12 +133,12 @@
         "en": "Marketing"
       },
       "skills": [
-        "content-draft-skill",
-        "brand-voice-skill",
-        "performance-report-skill",
-        "campaign-planning-skill",
-        "email-sequence-skill",
-        "seo-audit-skill"
+        "content-draft",
+        "brand-voice",
+        "performance-report",
+        "campaign-planning",
+        "email-sequence",
+        "seo-audit"
       ]
     },
     {
@@ -148,14 +148,14 @@
         "en": "Operations"
       },
       "skills": [
-        "change-management-skill",
-        "status-report-skill",
-        "capacity-planning-skill",
-        "process-doc-skill",
-        "process-optimization-skill",
-        "risk-assessment-skill",
-        "runbook-skill",
-        "compliance-tracking-skill"
+        "change-management",
+        "status-report",
+        "capacity-planning",
+        "process-doc",
+        "process-optimization",
+        "risk-assessment",
+        "runbook",
+        "compliance-tracking"
       ]
     },
     {
@@ -165,14 +165,14 @@
         "en": "Product Management"
       },
       "skills": [
-        "competitor-brief-skill",
-        "sprint-planning-skill",
-        "stakeholder-update-skill",
-        "research-synthesis-skill",
-        "metrics-review-skill",
-        "product-brainstorm-skill",
-        "roadmap-update-skill",
-        "product-spec-skill"
+        "competitor-brief",
+        "sprint-planning",
+        "stakeholder-update",
+        "research-synthesis",
+        "metrics-review",
+        "product-brainstorm",
+        "roadmap-update",
+        "product-spec"
       ]
     },
     {
@@ -182,9 +182,9 @@
         "en": "Productivity"
       },
       "skills": [
-        "meeting-prep-skill",
-        "weekly-review-skill",
-        "memory-management-skill"
+        "meeting-prep",
+        "weekly-review",
+        "memory-management"
       ]
     },
     {
@@ -194,15 +194,15 @@
         "en": "Sales"
       },
       "skills": [
-        "deal-strategy-skill",
-        "account-research-skill",
-        "forecast-skill",
-        "battlecard-skill",
-        "call-prep-skill",
-        "pipeline-review-skill",
-        "sales-asset-skill",
-        "outreach-skill",
-        "call-summary-skill"
+        "deal-strategy",
+        "account-research",
+        "forecast",
+        "battlecard",
+        "call-prep",
+        "pipeline-review",
+        "sales-asset",
+        "outreach",
+        "call-summary"
       ]
     }
   ]

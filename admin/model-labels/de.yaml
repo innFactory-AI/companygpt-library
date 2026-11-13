@@ -1,0 +1,149 @@
+# Kuratierte Modell-Labels (Deutsch). Format: LibreChat `modelSpecs`, siehe README.md.
+# Vor dem Einsatz an den Tenant anpassen: nur Modelle behalten, die es dort gibt, `endpoint` pruefen.
+modelSpecs:
+  prioritize: true
+  enforce: false
+  # addedEndpoints: [agents, AI-Gateway]   # tenant-specific, see README.md
+  list:
+  - name: gpt-6-luna
+    label: GPT-6 Luna
+    description: Schnelle Antworten bei minimalen Kosten
+    default: true
+    order: 1
+    group: OpenAI
+    groupIcon: openAI
+    preset:
+      endpoint: openAI
+      model: gpt-6-luna
+      useResponsesApi: true
+  - name: gpt-6-sol
+    label: GPT-6 Sol
+    description: Anspruchsvolle Aufgaben mit starker Intelligenz zu fairen Kosten
+    order: 2
+    group: OpenAI
+    preset:
+      endpoint: openAI
+      model: gpt-6-sol
+      useResponsesApi: true
+  - name: gpt-6.1-sol
+    label: GPT-6.1 Sol
+    description: Neueste Version der Sol-Stufe für anspruchsvolle Aufgaben
+    order: 3
+    group: OpenAI
+    preset:
+      endpoint: openAI
+      model: gpt-6.1-sol
+      useResponsesApi: true
+  - name: gpt-5.6-sol
+    label: GPT-5.6 Sol
+    description: Flaggschiff-Stufe mit der höchsten Leistungsfähigkeit
+    order: 4
+    group: OpenAI
+    preset:
+      endpoint: openAI
+      model: gpt-5.6-sol
+      useResponsesApi: true
+  - name: gpt-5.6-terra
+    label: GPT-5.6 Terra
+    description: Ausgewogene Mittelklasse für den Arbeitsalltag
+    order: 5
+    group: OpenAI
+    preset:
+      endpoint: openAI
+      model: gpt-5.6-terra
+      useResponsesApi: true
+  - name: gpt-5.6-luna
+    label: GPT-5.6 Luna
+    description: Schnellste und kosteneffizienteste Stufe
+    order: 6
+    group: OpenAI
+    preset:
+      endpoint: openAI
+      model: gpt-5.6-luna
+      useResponsesApi: true
+  - name: gpt-5.4
+    label: GPT-5.4
+    description: Anspruchsvolle Aufgaben über viele Themen hinweg
+    order: 7
+    group: OpenAI
+    preset:
+      endpoint: openAI
+      model: gpt-5.4
+      useResponsesApi: true
+  - name: gpt-5.1
+    label: GPT-5.1
+    description: Tiefgehendes Denken bei hoher Zuverlässigkeit
+    order: 8
+    group: OpenAI
+    preset:
+      endpoint: openAI
+      model: gpt-5.1
+      useResponsesApi: true
+  - name: gpt-5-mini
+    label: GPT-5 mini
+    description: Gehobenes Niveau bei hoher Geschwindigkeit
+    order: 9
+    group: OpenAI
+    preset:
+      endpoint: openAI
+      model: gpt-5-mini
+      useResponsesApi: true
+  - name: gpt-5-nano
+    label: GPT-5 nano
+    description: Ultraschnelle Antworten und einfache Hilfestellungen
+    order: 10
+    group: OpenAI
+    preset:
+      endpoint: openAI
+      model: gpt-5-nano
+      useResponsesApi: true
+  - name: claude-opus-5-5
+    label: Claude Opus 5.5
+    description: Die anspruchsvollsten Aufgaben, Qualität vor Kosten
+    order: 11
+    group: Anthropic
+    groupIcon: anthropic
+    preset:
+      endpoint: anthropic
+      model: claude-opus-5-5
+  - name: claude-sonnet-5-5
+    label: Claude Sonnet 5.5
+    description: Programmieren, komplexe Texte und anspruchsvolle Allround-Aufgaben
+    order: 12
+    group: Anthropic
+    preset:
+      endpoint: anthropic
+      model: claude-sonnet-5-5
+  - name: claude-haiku-5-5
+    label: Claude Haiku 5.5
+    description: Sehr schnelle Verarbeitung zu sehr geringen Kosten
+    order: 13
+    group: Anthropic
+    preset:
+      endpoint: anthropic
+      model: claude-haiku-5-5
+  - name: gemini-4-argon
+    label: Gemini 4 Argon
+    description: Anspruchsvolle Aufgaben mit sehr viel Kontext
+    order: 14
+    group: Google
+    groupIcon: google
+    preset:
+      endpoint: Google
+      model: gemini-4-argon
+  - name: gemini-3.8-flash
+    label: Gemini 3.8 Flash
+    description: Autonomes Denken bei hoher Geschwindigkeit
+    order: 15
+    group: Google
+    preset:
+      endpoint: Google
+      model: gemini-3.8-flash
+  - name: gemini-3.5-flash-lite
+    label: Gemini 3.5 Flash-Lite
+    description: Maximale Geschwindigkeit und Kosteneffizienz
+    order: 16
+    group: Google
+    preset:
+      endpoint: Google
+      model: gemini-3.5-flash-lite

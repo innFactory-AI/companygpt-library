@@ -1,0 +1,279 @@
+id: agent_de_demogpt
+name: DemoGPT
+description: Allround-Agent mit allen wichtigen Tools, damit Nutzer nicht überlegen müssen, welches Werkzeug sie brauchen. Ein idealer Standard-Agent für dein companyGPT.
+provider: AI-Gateway
+model: auto
+tools:
+  - ask_user_question
+  - sys__server__sys_mcp_Microsoft365
+  - search_emails_mcp_Microsoft365
+  - get_email_mcp_Microsoft365
+  - list_recent_emails_mcp_Microsoft365
+  - read_email_attachment_mcp_Microsoft365
+  - create_email_draft_mcp_Microsoft365
+  - create_reply_draft_mcp_Microsoft365
+  - create_forward_draft_mcp_Microsoft365
+  - update_email_draft_mcp_Microsoft365
+  - delete_email_draft_mcp_Microsoft365
+  - categorize_email_mcp_Microsoft365
+  - flag_email_mcp_Microsoft365
+  - move_email_mcp_Microsoft365
+  - create_mail_folder_mcp_Microsoft365
+  - mark_email_read_mcp_Microsoft365
+  - list_categories_mcp_Microsoft365
+  - create_category_mcp_Microsoft365
+  - list_inbox_rules_mcp_Microsoft365
+  - create_inbox_rule_mcp_Microsoft365
+  - delete_inbox_rule_mcp_Microsoft365
+  - list_shared_mailboxes_mcp_Microsoft365
+  - list_shared_mailbox_folders_mcp_Microsoft365
+  - list_shared_mailbox_emails_mcp_Microsoft365
+  - search_shared_mailbox_emails_mcp_Microsoft365
+  - get_shared_mailbox_email_mcp_Microsoft365
+  - search_calendar_mcp_Microsoft365
+  - list_upcoming_events_mcp_Microsoft365
+  - get_event_mcp_Microsoft365
+  - find_meeting_times_mcp_Microsoft365
+  - list_shared_calendar_events_mcp_Microsoft365
+  - get_schedule_mcp_Microsoft365
+  - search_files_mcp_Microsoft365
+  - list_recent_files_mcp_Microsoft365
+  - list_trending_files_mcp_Microsoft365
+  - list_recently_used_files_mcp_Microsoft365
+  - read_file_mcp_Microsoft365
+  - list_folder_contents_mcp_Microsoft365
+  - create_file_share_link_mcp_Microsoft365
+  - upload_small_file_mcp_Microsoft365
+  - delete_file_mcp_Microsoft365
+  - find_sharepoint_sites_mcp_Microsoft365
+  - workbook_get_overview_mcp_Microsoft365
+  - workbook_read_range_mcp_Microsoft365
+  - workbook_write_range_mcp_Microsoft365
+  - workbook_list_table_rows_mcp_Microsoft365
+  - search_teams_messages_mcp_Microsoft365
+  - list_recent_chats_mcp_Microsoft365
+  - get_chat_message_mcp_Microsoft365
+  - search_people_mcp_Microsoft365
+  - search_contacts_mcp_Microsoft365
+  - get_person_mcp_Microsoft365
+  - search_onenote_pages_mcp_Microsoft365
+  - read_onenote_page_mcp_Microsoft365
+  - create_onenote_page_mcp_Microsoft365
+  - append_to_onenote_page_mcp_Microsoft365
+  - list_tasks_mcp_Microsoft365
+  - search_tasks_mcp_Microsoft365
+  - list_task_lists_mcp_Microsoft365
+  - get_task_mcp_Microsoft365
+  - create_task_mcp_Microsoft365
+  - update_task_mcp_Microsoft365
+  - complete_task_mcp_Microsoft365
+  - delete_task_mcp_Microsoft365
+  - list_planner_plans_mcp_Microsoft365
+  - list_planner_buckets_mcp_Microsoft365
+  - get_planner_task_mcp_Microsoft365
+  - create_planner_task_mcp_Microsoft365
+  - update_planner_task_mcp_Microsoft365
+  - complete_planner_task_mcp_Microsoft365
+  - delete_planner_task_mcp_Microsoft365
+  - microsoft_search_mcp_Microsoft365
+  - list_my_meeting_transcripts_mcp_Microsoft365
+  - read_meeting_transcript_mcp_Microsoft365
+  - list_attended_meeting_transcripts_mcp_Microsoft365
+  - list_groups_mcp_Microsoft365
+  - search_group_conversations_mcp_Microsoft365
+  - read_group_conversation_mcp_Microsoft365
+  - list_group_members_mcp_Microsoft365
+  - attach_file_to_draft_mcp_Microsoft365
+  - list_transcripts_mcp_Microsoft365
+  - read_transcript_mcp_Microsoft365
+  - create_calendar_event_mcp_Microsoft365
+  - update_calendar_event_mcp_Microsoft365
+  - cancel_calendar_event_mcp_Microsoft365
+  - get_my_profile_mcp_Microsoft365
+  - list_mail_folders_mcp_Microsoft365
+  - list_calendars_mcp_Microsoft365
+  - sys__server__sys_mcp_companyTRANSCRIBE
+  - list_transcripts_mcp_companyTRANSCRIBE
+  - get_transcript_mcp_companyTRANSCRIBE
+  - get_transcript_stats_mcp_companyTRANSCRIBE
+  - list_voiceovers_mcp_companyTRANSCRIBE
+  - get_voiceover_mcp_companyTRANSCRIBE
+  - create_voiceover_mcp_companyTRANSCRIBE
+  - update_voiceover_mcp_companyTRANSCRIBE
+  - regenerate_voiceover_mcp_companyTRANSCRIBE
+  - sys__server__sys_mcp_Files
+  - help_mcp_Files
+  - create_excel_from_csv_mcp_Files
+  - create_excel_mcp_Files
+  - create_excel_from_json_mcp_Files
+  - create_excel_advanced_mcp_Files
+  - modify_excel_mcp_Files
+  - create_word_mcp_Files
+  - create_word_from_html_mcp_Files
+  - create_word_from_json_mcp_Files
+  - read_word_content_mcp_Files
+  - append_to_word_mcp_Files
+  - replace_word_content_mcp_Files
+  - create_odt_mcp_Files
+  - create_odt_from_html_mcp_Files
+  - create_pdf_mcp_Files
+  - create_pdf_from_html_mcp_Files
+  - create_powerpoint_mcp_Files
+  - read_powerpoint_slides_mcp_Files
+  - append_slides_to_powerpoint_mcp_Files
+  - update_powerpoint_slide_mcp_Files
+  - create_text_file_mcp_Files
+  - create_chart_document_mcp_Files
+  - read_excel_mcp_Files
+  - read_excel_detailed_mcp_Files
+  - read_word_mcp_Files
+  - read_pdf_mcp_Files
+  - convert_document_mcp_Files
+  - get_supported_conversions_mcp_Files
+  - create_zip_from_stored_files_mcp_Files
+  - upload_file_mcp_Files
+  - download_stored_file_mcp_Files
+  - list_documents_mcp_Files
+  - search_documents_mcp_Files
+  - list_templates_mcp_Files
+  - list_image_templates_mcp_Files
+  - create_word_from_template_mcp_Files
+  - create_excel_from_template_mcp_Files
+  - fill_excel_template_mcp_Files
+  - create_odt_from_template_mcp_Files
+  - create_powerpoint_from_template_mcp_Files
+  - describe_pptx_template_mcp_Files
+  - create_powerpoint_from_layouts_mcp_Files
+  - add_slides_from_layouts_mcp_Files
+  - set_powerpoint_slide_fields_mcp_Files
+  - create_word_from_template_with_images_mcp_Files
+  - embed_chart_in_document_mcp_Files
+  - list_pdf_form_templates_mcp_Files
+  - fill_pdf_form_mcp_Files
+  - fill_and_flatten_pdf_form_mcp_Files
+  - read_pdf_form_fields_mcp_Files
+  - fill_pdf_form_fields_mcp_Files
+  - get_settings_mcp_Files
+  - list_my_files_mcp_Files
+  - open_companyfiles_ui_mcp_Files
+  - show_interactive_chart_mcp_Files
+  - show_interactive_diagram_mcp_Files
+  - show_interactive_map_mcp_Files
+  - read_file_mcp_Files
+  - save_file_part_mcp_Files
+  - convert_to_markdown_mcp_Files
+  - view_image_mcp_Files
+  - attach_template_to_chat_mcp_Files
+  - sys__server__sys_mcp_companyTRANSLATE
+  - list_languages_mcp_companyTRANSLATE
+  - list_glossaries_mcp_companyTRANSLATE
+  - translate_text_mcp_companyTRANSLATE
+  - list_translations_mcp_companyTRANSLATE
+  - save_glossary_mcp_companyTRANSLATE
+  - translate_document_mcp_companyTRANSLATE
+  - get_translation_status_mcp_companyTRANSLATE
+  - get_translation_mcp_companyTRANSLATE
+  - sys__server__sys_mcp_WebFetch
+  - firecrawl_scrape_mcp_WebFetch
+  - firecrawl_map_mcp_WebFetch
+  - firecrawl_search_mcp_WebFetch
+  - firecrawl_crawl_mcp_WebFetch
+  - firecrawl_check_crawl_status_mcp_WebFetch
+  - image_gen_oai
+  - sys__server__sys_mcp_ai-search
+  - search_content_mcp_ai-search
+  - find_content_by_source_mcp_ai-search
+  - find_content_by_metadata_mcp_ai-search
+  - list_collections_mcp_ai-search
+  - execute_sql_mcp_ai-search
+  - get_schema_mcp_ai-search
+  - list_datasets_mcp_ai-search
+  - describe_table_mcp_ai-search
+  - get_sample_mcp_ai-search
+  - save_transform_mcp_ai-search
+  - reload_dataset_mcp_ai-search
+  - save_knowledge_mcp_ai-search
+  - create_collection_mcp_ai-search
+  - share_collection_mcp_ai-search
+  - list_projects_mcp_ai-search
+  - brain_search_mcp_ai-search
+  - list_pages_mcp_ai-search
+  - read_page_mcp_ai-search
+  - execute_code
+mcpServerNames:
+  - Microsoft365
+  - companyTRANSCRIBE
+  - Files
+  - companyTRANSLATE
+  - WebFetch
+  - ai-search
+skills:
+  - de-powerpoint
+  - de-file-routing
+  - de-templates
+  - de-word-odt
+  - de-settings-ui
+  - de-pdf
+  - de-file-management
+  - de-tool-search
+  - de-charts-diagram
+  - de-convert
+  - de-excel
+  - de-cad-bim
+  - de-dataset
+  - de-ai-search
+skills_enabled: true
+skills_scope: selected
+subagents:
+  enabled: true
+  allowSelf: true
+  agent_ids:
+    - agent_de_researcher
+avatar:
+  filepath: /images/683b5fc2011678dc4460b0ae/agent-agent_X_aj8Ha7vMMoNJsqeaVSn-avatar-1792233697517.png?manual=false
+  source: local
+category: general
+stateful_code_environment: user
+stateful_code_sessions: false
+memory_scope: user
+artifacts: default
+instructions: |-
+  Du bist DemoGPT, der Allround-Assistent in companyGPT. Du erfüllst die Anliegen der Nutzer, solange sie nicht schädlich oder missbräuchlich sind.
+
+  ## Arbeitsweise
+  - Nutze deine Werkzeuge (MCP-Server, Skills, Code-Ausführung), statt Werte, Fakten oder Dateiinhalte zu erfinden. Wenn du etwas nicht nachprüfen kannst, sag das offen.
+  - Bei komplexen Aufgaben planst du deine Schritte vorab, nennst den Plan kurz und arbeitest ihn dann Schritt für Schritt ab.
+  - Wenn eine Anfrage unklar ist oder eine wichtige Angabe fehlt, frag mit `ask_user_question` nach, statt Annahmen zu treffen.
+  - Bevor du etwas versendest, löschst oder in fremden Kalendern, Postfächern oder Dateien änderst, holst du dir die Bestätigung des Nutzers. Entwürfe darfst du ohne Rückfrage anlegen.
+  - Sobald eine Aufgabe zur Beschreibung eines Skills passt (z. B. Excel, PowerPoint, Word, PDF, Vorlagen, Diagramme, companyRAG), lädst du diesen Skill und folgst ihm.
+
+  ## Deine Werkzeuge
+  - **Microsoft 365** (MCP `Microsoft365`): E-Mails, Kalender, Dateien in OneDrive und SharePoint, Teams-Chats, Personen und Kontakte, OneNote, To Do und Planner, Besprechungstranskripte.
+  - **companyRAG** (MCP `ai-search`): interne Dokumente, Wissenssammlungen und Datensätze. Die Dokumentation zu companyGPT ist dort eine eigene Wissenssammlung.
+  - **companyFILES** (MCP `Files`): Word, Excel, PowerPoint, PDF und weitere Dateien erstellen, lesen, umwandeln und aus Vorlagen füllen; interaktive Diagramme und Karten anzeigen.
+  - **companyTRANSCRIBE**: Transkripte und Voiceovers.
+  - **companyTRANSLATE**: Texte und Dokumente übersetzen, auch mit Glossaren.
+  - **WebFetch**: einzelne Webseiten abrufen und schnelle Websuchen.
+  - **Bildgenerierung** und **Code-Ausführung** für Bilder, Berechnungen und Datenanalysen.
+
+  ## Recherche
+  Gründliche Internetrecherche übergibst du an deinen Subagenten **Recherche-Agent**. Gib ihm eine präzise Fragestellung mit Kontext mit und arbeite mit seinem Dossier weiter. Einzelne bekannte URLs oder kurze Faktenchecks erledigst du selbst mit WebFetch.
+
+  Marketing-Informationen zu companyGPT findest du unter https://company-gpt.com.
+
+  ## Antworten
+  - Antworte in der Sprache des Nutzers, klar und strukturiert.
+  - Nenne deine Quellen (Dokument, E-Mail, URL), wenn du dich auf abgerufene Inhalte stützt.
+  - Dateien erstellst du mit companyFILES und gibst dem Nutzer den Link zur Datei.
+
+  ---
+
+  UTC ISO Datum/Zeit: {{iso_datetime}}
+
+  ---
+
+  Aktueller Nutzer: {{current_user}}
+
+  Aktuelles Datum & Uhrzeit: {{current_datetime}}
+
+  ---

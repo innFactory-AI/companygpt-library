@@ -1,4 +1,4 @@
-name: Skills
+name: Library
 
 on:
   pull_request:
@@ -10,18 +10,43 @@ permissions:
   contents: read
 
 jobs:
+  validate:
+    name: Validate layout
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run validate
+
   docs-build:
     # The docs site (innFactory-AI/docs) renders every skill as a page. Building it against this
-    # checkout catches missing page.md files, catalog mistakes and broken Markdown before merge.
-    name: Build docs with these skills
+    # checkout catches docs-only mistakes (Markdown, frontmatter) before merge. A docs branch with the
+    # same name as this PR's branch is used if it exists, so layout changes can be tested in both repos.
+    name: Build docs with this library
+    needs: validate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          path: skills
+          path: library
+      - name: Pick docs branch
+        id: docs
+        env:
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          if git ls-remote --exit-code --heads https://github.com/innFactory-AI/docs.git "$BRANCH" >/dev/null; then
+            echo "ref=$BRANCH" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=main" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/checkout@v4
         with:
           repository: innFactory-AI/docs
+          ref: ${{ steps.docs.outputs.ref }}
           path: docs
       - uses: actions/setup-node@v4
         with:
@@ -31,7 +56,7 @@ jobs:
       - run: npm ci
         working-directory: docs
       - name: Generate skill pages
-        run: node scripts/sync-skills.mjs --from "$GITHUB_WORKSPACE/skills"
+        run: node scripts/sync-skills.mjs --from "$GITHUB_WORKSPACE/library"
         working-directory: docs
       - name: Build docs
         run: npx --no-install astro build
