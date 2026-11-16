@@ -1,7 +1,8 @@
 # Model labels
 
-Curated display names and short descriptions for the chat models companyGPT offers, so users see
-"Claude Sonnet 5.5 – Programming, complex text …" instead of a bare model id like `claude-sonnet-5-5`.
+Curated display names and short descriptions for every chat model deployed in companyGPT, so users see
+"Claude Sonnet 5.5 – Programming, writing and demanding everyday work" instead of a bare model id like
+`claude-sonnet-5-5`.
 
 | File | Language |
 | --- | --- |
@@ -9,50 +10,61 @@ Curated display names and short descriptions for the chat models companyGPT offe
 | [`en.yaml`](en.yaml) | English labels and descriptions |
 
 companyGPT shows one label per model, not one per user language, so pick the file that matches your users. Both
-files list the same models in the same order; only `label` and `description` differ.
+files list the same models in the same order; only `label` and `description` are translated.
 
 ## Format
 
-LibreChat has no per-model display name. Labels are `modelSpecs` entries: a labelled preset per model.
-
 ```yaml
-modelSpecs:
-  prioritize: true        # labels are the default picker for new chats
-  enforce: false          # true = users can ONLY pick labelled models (and agents need their own label)
-  list:
-  - name: claude-sonnet-5-5           # stable key, stored in conversations: never change it
+labels:
+  - model: claude-sonnet-5-5          # model id as companyGPT knows it
     label: Claude Sonnet 5.5          # what the model picker shows
-    description: Programming, complex text and demanding all-round tasks
-    order: 12                         # position in the picker
     group: Anthropic                  # submenu in the picker
-    groupIcon: anthropic              # icon of that submenu (first entry of a group)
-    preset:
-      endpoint: anthropic             # LibreChat endpoint that serves the model
-      model: claude-sonnet-5-5        # model id at that endpoint
+    description: Programming, writing and demanding everyday work
 ```
 
-`default: true` preselects a model for new chats (here `gpt-6-luna`). GPT models carry `useResponsesApi: true`:
-behind the AI gateway, reasoning only stays on during tool calls with the Responses API.
+The descriptions are written from the user's point of view: what a model is good for, so people can choose
+without knowing the model family. Where the provider publishes a short description, it is the basis.
 
 ## Applying the labels
 
-1. Copy the file for your language and **keep only the models your tenant has**. A label for a model that does not
-   exist shows up in the picker and fails when used.
-2. Check `preset.endpoint` against your `librechat.yaml`: `openAI` (GPT), `anthropic` (Claude) and `Google`
-   (custom endpoint for Gemini) are the usual names, but tenants differ.
-3. Apply it in one of two ways:
-   - **companyADMIN → Model labels** (`/config/labels`): enter label, description, group, endpoint and model per
-     row. companyADMIN stores them as a database override; `librechat.yaml` stays untouched.
-   - **`librechat.yaml`** (companyGPT Terraform, `env/<tenant>/librechat.yaml`): paste the `modelSpecs` block.
-     Also set `addedEndpoints` to the endpoints that should stay in the picker next to the labels (usually
-     `agents` and `AI-Gateway`). A non-empty `addedEndpoints` is the picker's allow-list: endpoints missing from it
-     are hidden.
+Labels are maintained by hand in **companyADMIN → Configuration → Labels** (`/config/labels`):
 
-Users see the models their role allows; labels for models they may not use are dropped automatically.
+1. The page lists the models of the environment that have no label yet. For each one, look up its `model` in the
+   file for your language and copy **label**, **description** and **group**.
+2. Only add labels for models the environment actually has. The files cover every model deployed anywhere in the
+   fleet, so most environments use only part of them.
+3. For GPT models on the `openAI` / `azureOpenAI` endpoint, keep the **Responses API** switch as it is in the
+   environment (it is on where the GPT models run through the AI gateway).
+
+Users only see the labels of models their role allows.
+
+## What is not in the list
+
+- Models that are not chat models: image generation (`gpt-image-*`), speech (`whisper`, `tts`,
+  `gpt-realtime-*`), OCR (`mistral-document-ai-*`), embeddings (`text-embedding-*`) and the gateway's routing
+  model `Microsoft-Decision-1`. They never appear in the model picker.
+- `auto-pro` and `auto-dev` are router flows set up per environment in the AI gateway; their descriptions are
+  generic. Adjust them if a tenant's flow does something else.
 
 ## Maintaining the list
 
-- The descriptions follow the model overview in the docs (`/de/company-gpt/modellauswahl`,
-  `/en/company-gpt/modellauswahl`). Update both when a model is added or retired.
-- Never change a `name` that is already released: conversations store it.
-- `npm run validate` checks that both files are valid and list the same models.
+- When a model is deployed for the first time (`companyGPT/env/<tenant>/config.tfvars` or `librechat.yaml`), add
+  it to both files in the same PR. Retired models can stay until no environment has them any more.
+- Keep `de.yaml` and `en.yaml` in the same order with the same `model` and `group`; `npm run validate` checks it.
+- Descriptions: one line, at most 120 characters, no prices or cost hints.
+
+## Sources
+
+The descriptions are based on the providers' own model descriptions where they exist (as of 2026-11-16):
+
+- OpenAI: [model pages](https://developers.openai.com/api/docs/models); model router:
+  [Microsoft Learn](https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-router)
+- Anthropic: [models overview](https://platform.claude.com/docs/en/models/overview) and the launch posts on
+  [anthropic.com/news](https://www.anthropic.com/news)
+- Google: [Vertex AI models](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models),
+  [AI Studio models](https://aistudio.google.com/docs/models)
+- Mistral: [docs.mistral.ai/models](https://docs.mistral.ai/models/mistral-large-3-25-12)
+- STACKIT: [available shared models](https://docs.stackit.cloud/products/data-and-ai/ai-model-serving/basics/available-shared-models)
+  and the model cards on Hugging Face
+- Perplexity: [Sonar models](https://docs.perplexity.ai/docs/sonar/models.md)
+- `auto*`: the AI gateway's auto router (`innFactory/ai-gateway`, `docs/auto-router.md`)
