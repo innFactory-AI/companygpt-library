@@ -15,7 +15,6 @@ agent only has when the skill is installed as a package (zip), not when just `SK
 catalog.json                                 # skill categories, order, docs index texts
 skills/<category>/<locale>-<id>/SKILL.md     # one skill per language: skills/files/de-excel, skills/files/en-excel
 skills/<category>/<locale>-<id>/references/  # optional bundled files (part of the skill package)
-pages/<category>/<id>.<locale>.md            # docs page wrapper (title, label, intro)
 agents/<locale>-<slug>.yaml                  # ready-made agents (DemoGPT, Researcher) per language
 admin/model-labels/                          # curated model labels per language (entered in companyADMIN)
 ```

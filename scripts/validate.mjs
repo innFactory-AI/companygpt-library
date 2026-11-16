@@ -2,7 +2,6 @@
 // Checks the repo layout before the docs build or companyADMIN Library Sync ever sees it.
 //
 //   skills/<category>/<locale>-<id>/SKILL.md   name == folder, locale prefix, both locales, listed under <category>
-//   pages/<category>/<id>.<locale>.md          one docs wrapper per catalog entry and locale
 //   agents/<locale>-<slug>.yaml                unique ids, skills/subagents resolve within the same locale
 //   admin/model-labels/<locale>.yaml           same models and groups in every locale
 //
@@ -79,20 +78,6 @@ for (const cat of dirs('skills')) {
 for (const [id, cat] of listed) {
 	for (const L of LOCALES) {
 		if (!existsSync(join(root, 'skills', cat, `${L}-${id}`, 'SKILL.md'))) fail(`skills/${cat}/${L}-${id}/SKILL.md: missing (listed in catalog.json)`);
-		const page = `pages/${cat}/${id}.${L}.md`;
-		if (!existsSync(join(root, page))) {
-			fail(`${page}: missing`);
-			continue;
-		}
-		const fm = frontmatter(page);
-		for (const key of ['title', 'description', 'label']) if (!fm[key]) fail(`${page}: frontmatter needs ${key}`);
-	}
-}
-for (const cat of dirs('pages')) {
-	for (const f of readdirSync(join(root, 'pages', cat)).filter((n) => n.endsWith('.md'))) {
-		const m = f.match(/^(.+)\.([a-z]{2})\.md$/);
-		if (!m || !LOCALES.includes(m[2])) fail(`pages/${cat}/${f}: file must be <id>.<${LOCALES.join('|')}>.md`);
-		else if (listed.get(m[1]) !== cat) fail(`pages/${cat}/${f}: not listed under ${cat} in catalog.json`);
 	}
 }
 

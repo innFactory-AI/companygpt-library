@@ -4,7 +4,8 @@ This repo is the **single source** for the ready-made companyGPT content that cu
 agents and admin defaults (model labels). The docs site ([innFactory-AI/docs](https://github.com/innFactory-AI/docs),
 docs.company-gpt.com → Tutorials → Skills) does not keep its own copy: its build runs `scripts/sync-skills.mjs`,
 which reads this repo (branch `main`) and generates every skill page, the skills index and the sidebar. Never edit
-skill pages in the docs repo; they are gitignored there. Customers also connect this repo directly in companyADMIN
+the generated skill pages in the docs repo; they are gitignored there (only the intros above each skill are
+kept there). Customers also connect this repo directly in companyADMIN
 Library Sync.
 
 It replaces `innFactory-AI/company-ai-stack-skills` (archived), where DE and EN skills had the same name and could
@@ -16,7 +17,6 @@ not be installed side by side.
 catalog.json                                  # skill categories, order (by <id>), index texts (DE/EN)
 skills/<category>/<locale>-<id>/SKILL.md      # the skill: what users upload in companyGPT under "Skills"
 skills/<category>/<locale>-<id>/references/…  # optional bundled files (Markdown recipes; optionally scripts/…)
-pages/<category>/<id>.<locale>.md             # docs wrapper: title, description, sidebar label, intro
 agents/<locale>-<slug>.yaml                   # ready-made companyGPT agent exports
 admin/model-labels/<locale>.yaml              # curated model labels for companyADMIN, README.md explains them
 scripts/validate.mjs                          # `npm run validate`, runs in CI
@@ -32,16 +32,17 @@ scripts/validate.mjs                          # `npm run validate`, runs in CI
   identity in Library Sync (a rename deletes and re-creates the skill in every tenant, agents lose the reference),
   and links point at the URL.
 - **Package = the skill folder.** Put nothing docs-only into it: companyADMIN Library Sync imports every file in a
-  folder that has a `SKILL.md`, which is why the docs wrapper lives under `pages/`. Everything in the folder
+  folder that has a `SKILL.md`, so docs-only content stays out of it (the page intros live in the docs repo, see
+  below). Everything in the folder
   (`SKILL.md`, `references/`, `scripts/`, …) is part of the skill package: the docs offer it as a zip
   (`<name>/SKILL.md` plus bundled files) that companyGPT imports under Skills (`.zip`/`.skill`). The agent reads
   bundled files with the built-in `read_file` tool (`<name>/references/x.md`, works without code execution); with
   code execution they are also copied read-only to `/mnt/data/skills/<name>/…` in the sandbox. A skill pasted or
   uploaded as a single `SKILL.md` has no bundled files.
-- `catalog.json` lists every category (`id` = folder under `skills/` and `pages/`, docs URL segment, `label.de`/
+- `catalog.json` lists every category (`id` = folder under `skills/`, docs URL segment, `label.de`/
   `label.en` = sidebar group and index heading) and its skills in display order, plus the title, description and
   intro of the skills index page. A skill folder that is not in `catalog.json` fails validation, and so does a
-  catalog entry without its skill and page in both locales.
+  catalog entry without its skill in both locales.
 
 ### SKILL.md
 
@@ -63,24 +64,13 @@ description: One or two sentences; LibreChat uses it to decide when to load the 
   ```` ``` ```` blocks are fine.
 - Cross-references to other skills (`**de-powerpoint**`, `de-templates/references/…`) use the same locale prefix.
 
-### pages/<category>/<id>.<locale>.md
+### Docs pages
 
-```markdown
----
-title: Excel Skill
-description: One sentence for search and the page header.
-label: Excel
----
-
-Use this skill when … (DE: "Verwende diesen Skill, wenn …", du-form)
-
-:::note
-Optional Starlight asides, e.g. placeholders the user must replace.
-:::
-```
-
-`label` is the sidebar and index entry; `title`/`description` become the page frontmatter. The body is shown above
-the skill. The generator adds `## Skill`, the fenced `SKILL.md` and a source link back to this repo.
+The docs page of a skill is the `SKILL.md` plus a short docs-only intro (title, description, sidebar label, intro
+text, notes such as placeholders to replace). The intros live in the docs repo, `src/skill-pages/<category>/<id>.<locale>.md`
+in innFactory-AI/docs (see its `AGENTS.md`). A new skill works without one: the page then takes its title and label
+from the `SKILL.md` heading and its description from the first sentence of `description`. Add the intro with a docs PR
+on a branch with the same name; this repo's CI builds the docs against it.
 
 ### agents/<locale>-<slug>.yaml
 
@@ -128,8 +118,8 @@ rollout.
 
 ## Workflow
 
-1. Branch, edit the skill and/or page wrapper in both locales, update `catalog.json` and the README table for new
-   skills.
+1. Branch, edit the skill in both locales, update `catalog.json` and the README table for new skills (intro for the
+   docs page: docs repo, see "Docs pages").
 2. `npm ci && npm run validate`.
 3. Preview locally with a docs checkout next to this repo:
    `cd ../docs && SKILLS_DIR=../companygpt-library npm run dev` (or `npm run build`).
