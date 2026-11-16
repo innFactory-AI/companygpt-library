@@ -19,6 +19,7 @@ labels:
   - model: claude-sonnet-5-5          # model id as companyGPT knows it
     label: Claude Sonnet 5.5          # what the model picker shows
     group: Anthropic                  # submenu in the picker
+    groupIcon: anthropic              # icon of that submenu
     description: Programming, writing and demanding everyday work
 ```
 
@@ -30,13 +31,31 @@ without knowing the model family. Where the provider publishes a short descripti
 Labels are maintained by hand in **companyADMIN → Configuration → Labels** (`/config/labels`):
 
 1. The page lists the models of the environment that have no label yet. For each one, look up its `model` in the
-   file for your language and copy **label**, **description** and **group**.
+   file for your language and copy **label**, **description**, **group** and **group icon**.
 2. Only add labels for models the environment actually has. The files cover every model deployed anywhere in the
    fleet, so most environments use only part of them.
 3. For GPT models on the `openAI` / `azureOpenAI` endpoint, keep the **Responses API** switch as it is in the
    environment (it is on where the GPT models run through the AI gateway).
 
 Users only see the labels of models their role allows.
+
+### Group icons
+
+The picker shows one icon per group, taken from the first label of the group that has one. Every entry carries its
+group's icon anyway, so it does not matter which one you enter first.
+
+| Group | `groupIcon` | |
+| --- | --- | --- |
+| Auto, OpenAI | `openAI` | LibreChat's built-in OpenAI icon (as on groku/schoenklinik, where Auto sits in the OpenAI group) |
+| Anthropic | `anthropic` | built-in |
+| Google | `google` | built-in |
+| Mistral | `mistral` | built-in |
+| Perplexity | `perplexity` | built-in |
+| STACKIT | `https://storage.googleapis.com/compangygpt-public-data/misc/stackit-icon.svg` | no built-in icon; the icon the tenants' STACKIT endpoint already uses |
+
+A provider name (any case, also aliases like `claude`, `gemini`) becomes LibreChat's built-in icon; anything else is
+loaded as an image URL. The bucket `compangygpt-public-data/misc/` also has `google-icon.svg` and
+`perplexity-icon.svg` if a tenant prefers the endpoint icons.
 
 ## What is not in the list
 
