@@ -18,7 +18,7 @@ skills/<category>/<locale>-<id>/SKILL.md      # the skill: what users upload in 
 skills/<category>/<locale>-<id>/references/…  # optional bundled files (Markdown recipes; optionally scripts/…)
 pages/<category>/<id>.<locale>.md             # docs wrapper: title, description, sidebar label, intro
 agents/<locale>-<slug>.yaml                   # ready-made companyGPT agent exports
-admin/model-labels/<locale>.yaml              # curated model labels (LibreChat modelSpecs), README.md explains them
+admin/model-labels/<locale>.yaml              # curated model labels for companyADMIN, README.md explains them
 scripts/validate.mjs                          # `npm run validate`, runs in CI
 ```
 
@@ -94,8 +94,10 @@ locale.
 
 Admin defaults that are not synced automatically; an admin applies them by hand. They are not multilingual in
 companyGPT yet, so each has one file per locale side by side, plus a `README.md`. `admin/model-labels/` holds
-curated labels for model ids in the LibreChat `modelSpecs` format (what companyADMIN → Model labels stores). Keep
-`de.yaml` and `en.yaml` on the same models in the same order; only `label`/`description` are translated.
+a label, group and user-facing description for every chat model deployed anywhere in the fleet; admins enter them
+by hand in companyADMIN → Configuration → Labels. Keep `de.yaml` and `en.yaml` on the same models and groups in the
+same order; only `label`/`description` are translated. A newly deployed chat model gets its entry in the same
+rollout.
 
 ## Writing rules
 

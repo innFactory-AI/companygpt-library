@@ -4,7 +4,7 @@
 //   skills/<category>/<locale>-<id>/SKILL.md   name == folder, locale prefix, both locales, listed under <category>
 //   pages/<category>/<id>.<locale>.md          one docs wrapper per catalog entry and locale
 //   agents/<locale>-<slug>.yaml                unique ids, skills/subagents resolve within the same locale
-//   admin/model-labels/<locale>.yaml           same model list in every locale
+//   admin/model-labels/<locale>.yaml           same models and groups in every locale
 //
 // Usage: npm run validate
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -145,21 +145,21 @@ for (const L of LOCALES) {
 		fail(`${rel}: not valid YAML (${e.message.split('\n')[0]})`);
 		continue;
 	}
-	const list = doc?.modelSpecs?.list;
+	const list = doc?.labels;
 	if (!Array.isArray(list)) {
-		fail(`${rel}: needs modelSpecs.list`);
+		fail(`${rel}: needs a labels list`);
 		continue;
 	}
-	const names = new Set();
-	for (const s of list) {
-		if (!s.name || !s.label || !s.preset?.endpoint || !s.preset?.model) fail(`${rel}: ${s.name || '?'} needs name, label, preset.endpoint and preset.model`);
-		if (names.has(s.name)) fail(`${rel}: ${s.name} is listed twice`);
-		names.add(s.name);
+	const models = new Set();
+	for (const l of list) {
+		for (const key of ['model', 'label', 'group', 'description']) if (!l?.[key]) fail(`${rel}: ${l?.model || '?'} needs ${key}`);
+		if (String(l?.description || '').length > 120) fail(`${rel}: ${l.model} description longer than 120 characters`);
+		if (models.has(l?.model)) fail(`${rel}: ${l.model} is listed twice`);
+		models.add(l?.model);
 	}
-	if (list.filter((s) => s.default).length > 1) fail(`${rel}: more than one default`);
-	labelModels[L] = list.map((s) => `${s.name}=${s.preset?.endpoint}/${s.preset?.model}`).join(',');
+	labelModels[L] = list.map((l) => `${l?.model}@${l?.group}`).join(',');
 }
-if (labelModels.de && labelModels.en && labelModels.de !== labelModels.en) fail('admin/model-labels: de.yaml and en.yaml must list the same models in the same order');
+if (labelModels.de && labelModels.en && labelModels.de !== labelModels.en) fail('admin/model-labels: de.yaml and en.yaml must list the same models (and groups) in the same order');
 
 if (errors.length) {
 	console.error(`validate: ${errors.length} problem(s):\n  - ${errors.join('\n  - ')}`);

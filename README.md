@@ -17,7 +17,7 @@ skills/<category>/<locale>-<id>/SKILL.md     # one skill per language: skills/fi
 skills/<category>/<locale>-<id>/references/  # optional bundled files (part of the skill package)
 pages/<category>/<id>.<locale>.md            # docs page wrapper (title, label, intro)
 agents/<locale>-<slug>.yaml                  # ready-made agents (DemoGPT, Researcher) per language
-admin/model-labels/                          # curated model labels (LibreChat modelSpecs) per language
+admin/model-labels/                          # curated model labels per language (entered in companyADMIN)
 ```
 
 Skill names carry the language as a prefix (`de-excel`, `en-excel`), so both languages can be installed in the

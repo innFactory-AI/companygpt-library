@@ -1,149 +1,269 @@
-# Kuratierte Modell-Labels (Deutsch). Format: LibreChat `modelSpecs`, siehe README.md.
-# Vor dem Einsatz an den Tenant anpassen: nur Modelle behalten, die es dort gibt, `endpoint` pruefen.
-modelSpecs:
-  prioritize: true
-  enforce: false
-  # addedEndpoints: [agents, AI-Gateway]   # tenant-specific, see README.md
-  list:
-  - name: gpt-6-luna
+# Kuratierte Modell-Labels (Deutsch) zum Eintragen in companyADMIN → Konfiguration → Labels.
+# Ein Eintrag je Modell, das irgendwo in der Flotte deployt ist; siehe README.md.
+labels:
+
+  # Auto
+  - model: auto
+    label: Auto
+    group: Auto
+    description: Wählt je Anfrage das passende Modell, von kurzen Antworten bis zu komplexen Aufgaben
+  - model: auto-standard
+    label: Auto (Standard)
+    group: Auto
+    description: Wählt je Anfrage das passende Modell, von kurzen Antworten bis zu komplexen Aufgaben
+  - model: auto-pro
+    label: Auto Pro
+    group: Auto
+    description: Automatische Modellwahl mit Vorrang für die leistungsstärksten Modelle bei anspruchsvoller Arbeit
+  - model: auto-dev
+    label: Auto Dev
+    group: Auto
+    description: Automatische Modellwahl, abgestimmt auf Programmier- und Entwicklungsaufgaben
+
+  # OpenAI
+  - model: gpt-6-luna
     label: GPT-6 Luna
-    description: Schnelle Antworten bei minimalen Kosten
-    default: true
-    order: 1
     group: OpenAI
-    groupIcon: openAI
-    preset:
-      endpoint: openAI
-      model: gpt-6-luna
-      useResponsesApi: true
-  - name: gpt-6-sol
+    description: "Schnellstes GPT-6: kurze Antworten und klar umrissene Alltagsaufgaben"
+  - model: gpt-6.1-terra
+    label: GPT-6.1 Terra
+    group: OpenAI
+    description: "Ausgewogen und schnell: Bild- und Dokumentverständnis, Bildschirmaufgaben, klare Texte"
+  - model: gpt-6-sol
     label: GPT-6 Sol
-    description: Anspruchsvolle Aufgaben mit starker Intelligenz zu fairen Kosten
-    order: 2
     group: OpenAI
-    preset:
-      endpoint: openAI
-      model: gpt-6-sol
-      useResponsesApi: true
-  - name: gpt-6.1-sol
+    description: Komplexes Programmieren und mehrstufige, agentische Abläufe
+  - model: gpt-6.1-sol
     label: GPT-6.1 Sol
-    description: Neueste Version der Sol-Stufe für anspruchsvolle Aufgaben
-    order: 3
     group: OpenAI
-    preset:
-      endpoint: openAI
-      model: gpt-6.1-sol
-      useResponsesApi: true
-  - name: gpt-5.6-sol
-    label: GPT-5.6 Sol
-    description: Flaggschiff-Stufe mit der höchsten Leistungsfähigkeit
-    order: 4
-    group: OpenAI
-    preset:
-      endpoint: openAI
-      model: gpt-5.6-sol
-      useResponsesApi: true
-  - name: gpt-5.6-terra
-    label: GPT-5.6 Terra
-    description: Ausgewogene Mittelklasse für den Arbeitsalltag
-    order: 5
-    group: OpenAI
-    preset:
-      endpoint: openAI
-      model: gpt-5.6-terra
-      useResponsesApi: true
-  - name: gpt-5.6-luna
+    description: "Stärkstes GPT: komplexes Programmieren, Computersteuerung und anspruchsvolle Facharbeit"
+  - model: gpt-5.6-luna
     label: GPT-5.6 Luna
-    description: Schnellste und kosteneffizienteste Stufe
-    order: 6
     group: OpenAI
-    preset:
-      endpoint: openAI
-      model: gpt-5.6-luna
-      useResponsesApi: true
-  - name: gpt-5.4
+    description: "Schnellste GPT-5.6-Stufe: Routineaufgaben, schnelle Auswertungen und Massenarbeit"
+  - model: gpt-5.6-terra
+    label: GPT-5.6 Terra
+    group: OpenAI
+    description: Ausgewogener Allrounder für den Büroalltag und Dokumententwürfe
+  - model: gpt-5.6-sol
+    label: GPT-5.6 Sol
+    group: OpenAI
+    description: "Stärkste GPT-5.6-Stufe: komplexe Facharbeit und tiefgehende Analysen"
+  - model: gpt-5.4
     label: GPT-5.4
-    description: Anspruchsvolle Aufgaben über viele Themen hinweg
-    order: 7
     group: OpenAI
-    preset:
-      endpoint: openAI
-      model: gpt-5.4
-      useResponsesApi: true
-  - name: gpt-5.1
+    description: Starker Allrounder für Programmieren und Facharbeit
+  - model: gpt-5.4-mini
+    label: GPT-5.4 mini
+    group: OpenAI
+    description: "Schnell und stark: Programmieren, Computersteuerung und Agenten-Teilaufgaben"
+  - model: gpt-5.2
+    label: GPT-5.2
+    group: OpenAI
+    description: Vorheriges Spitzenmodell für komplexe Facharbeit
+  - model: gpt-5.2-codex
+    label: GPT-5.2 Codex
+    group: OpenAI
+    description: Spezialisiert auf lange, mehrstufige Programmieraufgaben
+  - model: gpt-5.1
     label: GPT-5.1
-    description: Tiefgehendes Denken bei hoher Zuverlässigkeit
-    order: 8
     group: OpenAI
-    preset:
-      endpoint: openAI
-      model: gpt-5.1
-      useResponsesApi: true
-  - name: gpt-5-mini
+    description: Programmieren und mehrstufige Aufgaben mit einstellbarer Denktiefe
+  - model: gpt-5.1-chat
+    label: GPT-5.1 Chat
+    group: OpenAI
+    description: ChatGPT-Variante von GPT-5.1 für natürliche Unterhaltungen
+  - model: gpt-5
+    label: GPT-5
+    group: OpenAI
+    description: Reasoning-Modell für Programmieren, Analysen und mehrstufige Aufgaben
+  - model: gpt-5-mini
     label: GPT-5 mini
-    description: Gehobenes Niveau bei hoher Geschwindigkeit
-    order: 9
     group: OpenAI
-    preset:
-      endpoint: openAI
-      model: gpt-5-mini
-      useResponsesApi: true
-  - name: gpt-5-nano
+    description: Schnell und solide für klar definierte Aufgaben und präzise Anweisungen
+  - model: gpt-5-nano
     label: GPT-5 nano
-    description: Ultraschnelle Antworten und einfache Hilfestellungen
-    order: 10
     group: OpenAI
-    preset:
-      endpoint: openAI
-      model: gpt-5-nano
-      useResponsesApi: true
-  - name: claude-opus-5-5
+    description: Sehr schnell für Zusammenfassungen, Klassifizierung und einfache Fragen
+  - model: gpt-4.1
+    label: GPT-4.1
+    group: OpenAI
+    description: Schnelle Antworten ohne Denkschritt; folgt Anweisungen genau, langer Kontext
+  - model: gpt-4.1-mini
+    label: GPT-4.1 mini
+    group: OpenAI
+    description: Kleinere, schnellere Variante von GPT-4.1 für einfache, strukturierte Aufgaben
+  - model: gpt-4o
+    label: GPT-4o
+    group: OpenAI
+    description: Vielseitiges Modell für Text und Bilder
+  - model: gpt-4o-mini
+    label: GPT-4o mini
+    group: OpenAI
+    description: Kleines, schnelles Modell für klar umrissene, einfache Aufgaben
+  - model: o3-mini
+    label: o3-mini
+    group: OpenAI
+    description: Kleines Reasoning-Modell für Logik, Mathematik und Code
+  - model: model-router
+    label: Model Router
+    group: OpenAI
+    description: Wählt für jede Anfrage automatisch ein passendes Modell
+
+  # Anthropic
+  - model: claude-fable-5
+    label: Claude Fable 5
+    group: Anthropic
+    description: "Stärkstes Claude-Modell: schwierigstes Denken und lange, komplexe Agenten-Aufgaben"
+  - model: claude-opus-5-5
     label: Claude Opus 5.5
-    description: Die anspruchsvollsten Aufgaben, Qualität vor Kosten
-    order: 11
     group: Anthropic
-    groupIcon: anthropic
-    preset:
-      endpoint: anthropic
-      model: claude-opus-5-5
-  - name: claude-sonnet-5-5
+    description: Lange Programmier- und Agenten-Aufgaben, komplexe Analysen und Wissensarbeit
+  - model: claude-sonnet-5-5
     label: Claude Sonnet 5.5
-    description: Programmieren, komplexe Texte und anspruchsvolle Allround-Aufgaben
-    order: 12
     group: Anthropic
-    preset:
-      endpoint: anthropic
-      model: claude-sonnet-5-5
-  - name: claude-haiku-5-5
+    description: "Beste Balance aus Tempo und Intelligenz: Programmieren, Texte und Alltagsaufgaben"
+  - model: claude-haiku-5-5
     label: Claude Haiku 5.5
-    description: Sehr schnelle Verarbeitung zu sehr geringen Kosten
-    order: 13
     group: Anthropic
-    preset:
-      endpoint: anthropic
-      model: claude-haiku-5-5
-  - name: gemini-4-argon
+    description: "Schnellstes Claude-Modell: Zusammenfassungen, Klassifizierung und schnelle Aufgaben"
+  - model: claude-opus-5
+    label: Claude Opus 5
+    group: Anthropic
+    description: "Vorgängergeneration Opus: anspruchsvolles Programmieren und komplexe Aufgaben"
+  - model: claude-sonnet-5
+    label: Claude Sonnet 5
+    group: Anthropic
+    description: "Vorgängergeneration Sonnet: Agenten-Aufgaben, Programmieren und Allround-Arbeit"
+  - model: claude-opus-4-8
+    label: Claude Opus 4.8
+    group: Anthropic
+    description: "Ältere Opus-Generation (4.x): anspruchsvolles Programmieren, Agenten und Wissensarbeit"
+  - model: claude-opus-4-7
+    label: Claude Opus 4.7
+    group: Anthropic
+    description: "Ältere Opus-Generation (4.x): schwierige Softwareentwicklung und komplexe Aufgaben"
+  - model: claude-opus-4-6
+    label: Claude Opus 4.6
+    group: Anthropic
+    description: "Ältere Opus-Generation (4.x): Programmieren, große Codebasen und komplexes Denken"
+  - model: claude-sonnet-4-6
+    label: Claude Sonnet 4.6
+    group: Anthropic
+    description: "Ältere Sonnet-Generation (4.x): Programmieren, lange Dokumente und Wissensarbeit"
+  - model: claude-haiku-4-5
+    label: Claude Haiku 4.5
+    group: Anthropic
+    description: "Ältere Haiku-Generation (4.x): schnelle Antworten für Chat und einfache Aufgaben"
+  - model: anthropic.claude-opus-4-8
+    label: Claude Opus 4.8
+    group: Anthropic
+    description: "Ältere Opus-Generation (4.x): anspruchsvolles Programmieren, Agenten und Wissensarbeit"
+  - model: anthropic.claude-sonnet-4-6
+    label: Claude Sonnet 4.6
+    group: Anthropic
+    description: "Ältere Sonnet-Generation (4.x): Programmieren, lange Dokumente und Wissensarbeit"
+  - model: anthropic.claude-haiku-4-5-20251001-v1:0
+    label: Claude Haiku 4.5
+    group: Anthropic
+    description: "Ältere Haiku-Generation (4.x): schnelle Antworten für Chat und einfache Aufgaben"
+
+  # Google
+  - model: gemini-4-argon
     label: Gemini 4 Argon
-    description: Anspruchsvolle Aufgaben mit sehr viel Kontext
-    order: 14
     group: Google
-    groupIcon: google
-    preset:
-      endpoint: Google
-      model: gemini-4-argon
-  - name: gemini-3.8-flash
+    description: Gemini-4-Reasoning-Modell für komplexe Analysen, Programmieren und sehr lange Dokumente
+  - model: gemini-3.8-flash
     label: Gemini 3.8 Flash
-    description: Autonomes Denken bei hoher Geschwindigkeit
-    order: 15
     group: Google
-    preset:
-      endpoint: Google
-      model: gemini-3.8-flash
-  - name: gemini-3.5-flash-lite
+    description: "Neuestes Flash: lange Programmieraufgaben, Agenten und mehrstufiges Denken"
+  - model: gemini-3.7-flash
+    label: Gemini 3.7 Flash
+    group: Google
+    description: Schnelles Alltagsmodell, zuverlässig bei mehrstufigen Aufgaben, Tools und Programmieren
+  - model: gemini-3.6-flash
+    label: Gemini 3.6 Flash
+    group: Google
+    description: Schneller Allrounder für Wissensarbeit, Programmieren, Bilder und Dokumente
+  - model: gemini-3.5-flash
+    label: Gemini 3.5 Flash
+    group: Google
+    description: Schnelles Modell mit nahezu Pro-Qualität für Agenten- und Programmieraufgaben
+  - model: gemini-3.5-flash-lite
     label: Gemini 3.5 Flash-Lite
-    description: Maximale Geschwindigkeit und Kosteneffizienz
-    order: 16
     group: Google
-    preset:
-      endpoint: Google
-      model: gemini-3.5-flash-lite
+    description: Sehr schnelle Antworten für einfache Aufgaben und leichte Automatisierungen
+  - model: gemini-3.1-flash-lite
+    label: Gemini 3.1 Flash-Lite
+    group: Google
+    description: Älteres Leichtmodell für kurze Fragen und einfache Aufgaben
+  - model: gemini-3.1-pro-preview
+    label: Gemini 3.1 Pro (Preview)
+    group: Google
+    description: Reasoning-Modell für komplexe Analysen und Programmieren (Vorschau, kann sich ändern)
+
+  # Mistral
+  - model: Mistral-Large-3
+    label: Mistral Large 3
+    group: Mistral
+    description: Großes multimodales Modell für anspruchsvolle Text-, Bild- und Sprachaufgaben
+  - model: mistral-medium-3-5
+    label: Mistral Medium 3.5
+    group: Mistral
+    description: Allrounder für Chat, Reasoning, Programmieren und mehrstufige Agentenaufgaben
+
+  # STACKIT
+  - model: Qwen/Qwen3-VL-235B-A22B-Instruct-FP8
+    label: Qwen3-VL 235B
+    group: STACKIT
+    description: Starkes Bild- und Dokumentverständnis plus Text, gehostet in Deutschland
+  - model: Qwen/Qwen3.6-27B
+    label: Qwen3.6 27B
+    group: STACKIT
+    description: Kompaktes Modell für Programmieren und technische Aufgaben, gehostet in Deutschland
+  - model: cortecs/Llama-3.3-70B-Instruct-FP8-Dynamic
+    label: Llama 3.3 70B
+    group: STACKIT
+    description: Solider mehrsprachiger Allrounder für Textaufgaben, gehostet in Deutschland
+  - model: google/gemma-4-31B-it
+    label: Gemma 4 31B
+    group: STACKIT
+    description: Multimodales Google-Modell für Text, Bilder und lange Dokumente, gehostet in Deutschland
+  - model: google/gemma-3-27b-it
+    label: Gemma 3 27B
+    group: STACKIT
+    description: Kompaktes multimodales Modell für Text und Bilder, gehostet in Deutschland
+  - model: openai/gpt-oss-120b
+    label: GPT-OSS 120B
+    group: STACKIT
+    description: Offenes OpenAI-Modell für komplexes Reasoning und Agentenaufgaben, gehostet in Deutschland
+  - model: openai/gpt-oss-20b
+    label: GPT-OSS 20B
+    group: STACKIT
+    description: Schnelles, schlankes offenes OpenAI-Modell für einfache Aufgaben, gehostet in Deutschland
+
+  # Perplexity
+  - model: sonar
+    label: Sonar
+    group: Perplexity
+    description: Schnelle Antworten und Faktenrecherche per Websuche, mit Quellen
+  - model: sonar-pro
+    label: Sonar Pro
+    group: Perplexity
+    description: Tiefere Webrecherche für komplexe Fragen und Rückfragen, mit Quellen
+  - model: sonar-reasoning
+    label: Sonar Reasoning
+    group: Perplexity
+    description: Schrittweises Denken über Websuchergebnisse, mit Quellen
+  - model: sonar-reasoning-pro
+    label: Sonar Reasoning Pro
+    group: Perplexity
+    description: Mehrstufiges Denken über viele Webquellen für analytische Fragen, mit Quellen
+  - model: sonar-deep-research
+    label: Sonar Deep Research
+    group: Perplexity
+    description: Umfassende Webrecherche mit ausführlichem Bericht und Quellen; dauert mehrere Minuten
+  - model: r1-1776
+    label: R1 1776
+    group: Perplexity
+    description: Reasoning-Modell (DeepSeek-R1-Variante) ohne Websuche
