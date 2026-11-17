@@ -407,19 +407,15 @@ Jede Folie wählt ihr Layout über `layoutId`, Layoutnamen oder Rolle – frei k
       "layout": "slideLayout11.xml",
       "fields": {
         "title": "Kernbefunde",
-        "body:10": [
-          "Drei Systeme decken 80 % ab",
-          { "text": "Redundante Datenhaltung", "level": 1 },
-          "Betriebskosten +9 % p. a."
-        ]
+        "body:10": "Drei Systeme decken 80 % ab\n\tRedundante Datenhaltung\nBetriebskosten +9 % p. a."
       }
     },
     {
       "layout": "Inhalt",
       "fields": {
         "title": "Handlungsoptionen",
-        "body:12": ["Option A: Konsolidierung", "Aufwand: hoch"],
-        "body:13": ["Option B: Schnittstellen", "Aufwand: mittel"]
+        "body:12": "Option A: Konsolidierung\nAufwand: hoch",
+        "body:13": "Option B: Schnittstellen\nAufwand: mittel"
       }
     },
     { "layout": "closing", "fields": { "body:11": "Muster GmbH\n12345 Musterstadt" } }
@@ -442,8 +438,8 @@ bloße Typ `pic` oder die Synonyme `image`/`picture`/`photo`). Als Quellen diene
 `{ "base64": "..." }` funktionieren genauso. Das Bild übernimmt Position und Größe aus dem Layout und wird
 auf das Seitenverhältnis des Slots zugeschnitten (`cover`). Soll das ganze Bild zu sehen sein, nutze die
 Objektform mit `"fit": "contain"` (ein Rahmen im Seitenverhältnis des Bildes, mittig im Slot); `"stretch"`
-nur auf Wunsch. Auch einfache Strings gehen: `"images": { "pic:14": "lc:abc-attachment-id" }` (ebenso
-`doc:<document_id>`, `img:<name>` oder eine `data:image/…`-URI). Eine nicht auflösbare
+nur auf Wunsch. Nimm in `images` immer die Objektform: Die kurzen Strings (`"lc:…"`, `"doc:…"`, `"img:<name>"`,
+`data:image/…`) kennt companyFILES zwar, companyGPT lehnt sie in `images` aber ab. Eine nicht auflösbare
 `lc:`/`doc:`/`img:`-Referenz bricht den Aufruf ab, der Fehler nennt sie.
 
 **Diagramme** gehören in ein `charts`-Objekt pro Folie, mit Keys wie bei `fields` (exakter Slot-Key wie
@@ -468,13 +464,20 @@ Feld **oder** ein Diagramm, nicht beides. Dasselbe Diagrammobjekt wie bei `slide
 
 `charts` funktioniert genauso in `add_slides_from_layouts` und `set_powerpoint_slide_fields`.
 
-**Slot-Werte** akzeptieren drei Formen:
+**Slot-Werte schreibst du als String.** `\n` beginnt einen neuen Absatz, führende Tabs setzen seine Ebene
+(ein Tab = eine Ebene, bis 8):
 
-| Wert                              | Ergebnis                                                   |
-| --------------------------------- | ---------------------------------------------------------- |
-| `"one line"`                      | Ein Absatz auf Ebene 0; `\n` teilt in mehrere Absätze      |
-| `["a", "b"]`                      | Ein Absatz pro Element, alle auf Ebene 0                   |
-| `[{ "text": "sub", "level": 1 }]` | Ein Absatz auf Ebene `level` 0–8                           |
+| Wert                                   | Ergebnis                                         |
+| -------------------------------------- | ------------------------------------------------ |
+| `"Eine Zeile"`                         | Ein Absatz auf Ebene 0                           |
+| `"Zeile 1\nZeile 2"`                   | Zwei Absätze auf Ebene 0                         |
+| `"Überschrift\n\tText\n\t\tPunkt"`     | Absätze auf Ebene 0, 1 und 2                     |
+
+So mischst du Überschrift, Fließtext und Aufzählung in einem Platzhalter. **Schick keine Arrays und keine
+`{ "text", "level" }`-Objekte in `fields`:** companyFILES nimmt sie zwar an, aber companyGPT lässt in `fields` nur
+Strings durch und lehnt sie mit „input failed schema validation“ ab. Bekommst du diesen Fehler, schreib den Wert als
+String mit `\n` und Tabs neu, statt es weiter mit Arrays zu versuchen. Tabs brauchen companyFILES 3.13 oder neuer;
+ältere Versionen schreiben sie als Text in den Absatz.
 
 Im Text werden `**fett**`, `*kursiv*` und `~~durchgestrichen~~` formatiert; Schrift, Größe und Farbe bleiben die des
 Layouts. Links erscheinen als „Text (URL)“, nicht klickbar.
@@ -501,7 +504,7 @@ aus. Das heißt:
   Aufzählungszeichen. Passt keiner, schreib die Punkte ohne Nummern.
 - **Viele Firmen-Master nutzen Ebene 0 für Fließtext und Ebene 1 für Aufzählungen** (Beispieltext
   „Mastertextformat bearbeiten / Zweite Ebene …“). Bei so einem Master schreibst du Einleitungstext
-  auf Ebene 0 und die Listenpunkte mit `"level": 1`.
+  auf Ebene 0 und die Listenpunkte mit einem Tab (`"Einleitung\n\tPunkt"`).
 
 Welche Ebene Aufzählungszeichen hat, zeigt `describe_pptx_template` nicht. Mit Code-Ausführung liest
 du es aus der Vorlage (siehe unten), ohne Code hältst du dich an die Regeln oben. Lies das Deck nach
@@ -557,7 +560,7 @@ Weg-C-Foliensatz über mehrere Runden – erstelle den Foliensatz nie neu, um Fo
   "document_id": "<id>",
   "slides": [
     { "layout": "Kapiteltrenner", "fields": { "title": "2. Zielbild" } },
-    { "layout": "slideLayout11.xml", "fields": { "title": "Roadmap", "body:10": ["Q1", "Q2"] } }
+    { "layout": "slideLayout11.xml", "fields": { "title": "Roadmap", "body:10": "Q1\nQ2" } }
   ]
 }
 ```
@@ -579,7 +582,7 @@ aber noch nicht enthält, werden hinzugefügt – auch Bild-Slots.
 {
   "document_id": "<id>",
   "slide_number": 3,
-  "fields": { "title": "Kernbefunde (überarbeitet)", "body:10": ["Neuer Punkt 1", "Neuer Punkt 2"] },
+  "fields": { "title": "Kernbefunde (überarbeitet)", "body:10": "Neuer Punkt 1\nNeuer Punkt 2" },
   "images": { "pic:14": { "librechat_file_id": "abc-attachment-id" } }
 }
 ```
@@ -1006,7 +1009,7 @@ Ein einziger Durchlauf, der alle Folienfunktionen abdeckt. Nützlich, um ein Dep
     tatsächlichen Anzahl.
 27. `pptx_inventory.py <Firmen-Master> --lists` → eine Zeile pro Text-Slot mit `at x%,y%` und
     `L0`…`L4`; ein Slot, dessen Master-Ebene 0 Aufzählungszeichen hat, zeigt `L0=bullet`. Befülle ihn
-    mit `["Punkt A", "Punkt B"]` (ohne getipptes `•`) → PowerPoint zeigt genau einen Punkt pro Zeile.
+    mit `"Punkt A\nPunkt B"` (ohne getipptes `•`) → PowerPoint zeigt genau einen Punkt pro Zeile.
 
 `MANUAL_TESTS.md` §4.6 (Corporate-Master) und §4.9 (im Chat angehängter Foliensatz) enthalten diese
 Szenarien als direkt ausführbare cURL-Befehle.
