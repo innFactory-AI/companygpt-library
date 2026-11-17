@@ -136,15 +136,18 @@ for (const L of LOCALES) {
 		continue;
 	}
 	const models = new Set();
+	const groupIcons = {};
 	for (const l of list) {
-		for (const key of ['model', 'label', 'group', 'description']) if (!l?.[key]) fail(`${rel}: ${l?.model || '?'} needs ${key}`);
+		for (const key of ['model', 'label', 'group', 'groupIcon', 'description']) if (!l?.[key]) fail(`${rel}: ${l?.model || '?'} needs ${key}`);
+		if (l?.group && groupIcons[l.group] && groupIcons[l.group] !== l.groupIcon) fail(`${rel}: ${l.model} has another groupIcon than the rest of group ${l.group}`);
+		if (l?.group) groupIcons[l.group] ??= l.groupIcon;
 		if (String(l?.description || '').length > 120) fail(`${rel}: ${l.model} description longer than 120 characters`);
 		if (models.has(l?.model)) fail(`${rel}: ${l.model} is listed twice`);
 		models.add(l?.model);
 	}
-	labelModels[L] = list.map((l) => `${l?.model}@${l?.group}`).join(',');
+	labelModels[L] = list.map((l) => `${l?.model}@${l?.group}@${l?.groupIcon}`).join(',');
 }
-if (labelModels.de && labelModels.en && labelModels.de !== labelModels.en) fail('admin/model-labels: de.yaml and en.yaml must list the same models (and groups) in the same order');
+if (labelModels.de && labelModels.en && labelModels.de !== labelModels.en) fail('admin/model-labels: de.yaml and en.yaml must list the same models (and groups, group icons) in the same order');
 
 if (errors.length) {
 	console.error(`validate: ${errors.length} problem(s):\n  - ${errors.join('\n  - ')}`);
