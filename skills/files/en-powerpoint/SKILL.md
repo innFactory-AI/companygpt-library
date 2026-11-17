@@ -398,19 +398,15 @@ Each slide picks its layout by `layoutId`, layout name, or role — mix freely.
       "layout": "slideLayout11.xml",
       "fields": {
         "title": "Kernbefunde",
-        "body:10": [
-          "Drei Systeme decken 80 % ab",
-          { "text": "Redundante Datenhaltung", "level": 1 },
-          "Betriebskosten +9 % p. a."
-        ]
+        "body:10": "Drei Systeme decken 80 % ab\n\tRedundante Datenhaltung\nBetriebskosten +9 % p. a."
       }
     },
     {
       "layout": "Inhalt",
       "fields": {
         "title": "Handlungsoptionen",
-        "body:12": ["Option A: Konsolidierung", "Aufwand: hoch"],
-        "body:13": ["Option B: Schnittstellen", "Aufwand: mittel"]
+        "body:12": "Option A: Konsolidierung\nAufwand: hoch",
+        "body:13": "Option B: Schnittstellen\nAufwand: mittel"
       }
     },
     { "layout": "closing", "fields": { "body:11": "Muster GmbH\n12345 Musterstadt" } }
@@ -430,8 +426,8 @@ Each slide picks its layout by `layoutId`, layout name, or role — mix freely.
 ```
 
 `{ "document_id": "..." }` (a PVC upload), `{ "image_template": "..." }` (image library) and
-`{ "base64": "..." }` work the same way, and so do plain strings: `"images": { "pic:14": "lc:abc-attachment-id" }`
-(also `doc:<document_id>`, `img:<name>` or a `data:image/…` URI). The picture inherits its position and
+`{ "base64": "..." }` work the same way. Always use the object form in `images`: companyFILES also knows the short
+strings (`"lc:…"`, `"doc:…"`, `"img:<name>"`, `data:image/…`), but companyGPT rejects them in `images`. The picture inherits its position and
 size from the layout and is cropped to the slot's aspect ratio (`cover`). To show the whole image
 instead, use the object form with `"fit": "contain"` (a frame in the image's ratio, centred in the
 slot); `"stretch"` only on request. An unresolvable `lc:`/`doc:`/`img:` reference aborts the call and
@@ -459,13 +455,20 @@ colours (Design → Colors) and fonts. A slot takes a field **or** a chart, not 
 
 `charts` works the same in `add_slides_from_layouts` and `set_powerpoint_slide_fields`.
 
-**Slot values** accept three shapes:
+**Write slot values as strings.** `\n` starts a new paragraph, leading tabs set its level (one tab = one level,
+up to 8):
 
-| Value                             | Result                                              |
-| --------------------------------- | --------------------------------------------------- |
-| `"one line"`                      | One paragraph at level 0; `\n` splits into paragraphs |
-| `["a", "b"]`                      | One paragraph per item, all at level 0              |
-| `[{ "text": "sub", "level": 1 }]` | One paragraph at `level` 0–8                        |
+| Value                                  | Result                                           |
+| -------------------------------------- | ------------------------------------------------ |
+| `"One line"`                           | One paragraph at level 0                         |
+| `"Line 1\nLine 2"`                     | Two paragraphs at level 0                        |
+| `"Heading\n\tText\n\t\tBullet"`        | Paragraphs at levels 0, 1 and 2                  |
+
+This is how you mix a heading, body text and bullets in one placeholder. **Don't send arrays or
+`{ "text", "level" }` objects in `fields`:** companyFILES accepts them, but companyGPT only lets strings through in
+`fields` and rejects them with "input failed schema validation". If you get that error, rewrite the value as a string
+with `\n` and tabs instead of retrying with arrays. Tabs need companyFILES 3.13 or later; older versions write them
+into the paragraph as text.
 
 Inline `**bold**`, `*italic*` and `~~strikethrough~~` are formatted; font, size and colour stay the layout's. Links
 appear as "text (url)", not clickable.
@@ -489,7 +492,7 @@ text into paragraphs; it does not switch bullets on or off. That means:
   numbers.
 - **Many corporate masters use level 0 for plain text and level 1 for bullets** (sample text "Edit
   Master text styles / Second level …"). On such a master, write intro text at level 0 and the list
-  items with `"level": 1`.
+  items with one tab (`"Intro\n\tBullet"`).
 
 You cannot see from `describe_pptx_template` which level is bulleted. With code execution, read it from
 the template (see below). Without code, follow the rules above. After building, read the deck back
@@ -542,7 +545,7 @@ grows across turns — never re-create the deck to add slides to it.
   "document_id": "<id>",
   "slides": [
     { "layout": "Kapiteltrenner", "fields": { "title": "2. Zielbild" } },
-    { "layout": "slideLayout11.xml", "fields": { "title": "Roadmap", "body:10": ["Q1", "Q2"] } }
+    { "layout": "slideLayout11.xml", "fields": { "title": "Roadmap", "body:10": "Q1\nQ2" } }
   ]
 }
 ```
@@ -563,7 +566,7 @@ are added — including picture slots.
 {
   "document_id": "<id>",
   "slide_number": 3,
-  "fields": { "title": "Kernbefunde (überarbeitet)", "body:10": ["Neuer Punkt 1", "Neuer Punkt 2"] },
+  "fields": { "title": "Kernbefunde (überarbeitet)", "body:10": "Neuer Punkt 1\nNeuer Punkt 2" },
   "images": { "pic:14": { "librechat_file_id": "abc-attachment-id" } }
 }
 ```
@@ -975,7 +978,7 @@ A single run that exercises every slide feature. Useful for verifying a deployme
     count.
 27. `pptx_inventory.py <corporate master> --lists` → one line per text slot with `at x%,y%` and
     `L0`…`L4`; a slot whose master level 0 is bulleted shows `L0=bullet`. Fill it with
-    `["Point A", "Point B"]` (no typed `•`) → PowerPoint shows exactly one bullet per line.
+    `"Point A\nPoint B"` (no typed `•`) → PowerPoint shows exactly one bullet per line.
 
 `MANUAL_TESTS.md` §4.6 (corporate master) and §4.9 (deck attached in the chat) hold these
 scenarios as ready-to-run cURL commands.
