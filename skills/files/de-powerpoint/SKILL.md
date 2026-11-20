@@ -23,6 +23,8 @@ Alles, was du brauchst, um `.pptx`-Foliensätze zu erstellen, zu erweitern und z
 | `list_my_files`                   | Findet einen Foliensatz, den der Nutzer im Chat angehängt hat (`file_id`)            |
 | `list_templates`                  | Findet verfügbare Vorlagen (`type: "potx"`) vor dem Erstellen                        |
 | `list_image_templates`            | Findet Bilder in der Bildbibliothek (`img:<name>`)                                   |
+| `search_library`                  | Sucht Bilder, Icons **und Bibliotheksfolien** nach Bedeutung (**de-marketing-library**) |
+| `insert_library_slides`           | Fügt freigegebene Bibliotheksfolien unverändert in ein Deck ein, direkt in der Datei |
 | `embed_chart_in_document`         | Chart.js-Diagramm als neuer Foliensatz; `title` fügt eine Titelfolie hinzu           |
 
 ---
@@ -264,6 +266,11 @@ oder eine Vorlage. Das Feld `image` nimmt `lc:<file_id>` (Chat-Anhang oder erzeu
 öffentliche http(s)-URL (siehe §6). `imageFit` legt fest, wie es seinen Bereich füllt: `"contain"`
 (Standard, ganzes Bild, mittig), `"cover"` (füllt den Bereich, beschneidet) oder `"stretch"` (verzerrt –
 nur auf Wunsch). Dasselbe gilt in `append_slides_to_powerpoint` und `update_powerpoint_slide`.
+
+**Icons:** `image` und Markdown nehmen auch `icon:<set>/<name>` (optional `?color=brand` oder `?color=RRGGBB`, nur
+einfarbige Icons), dargestellt als scharfer Vektor. **Feature-/Prozessfolie:** `iconGrid` (3–6 Punkte
+`{icon, title, text}`, optional `columns`, `color`) unter dem Folientitel; `type` ist weiterhin Pflicht, nimm
+`"default"`. Icons findest du mit `search_library`; Details in **de-marketing-library**.
 
 **Natives Diagramm auf einer Folie:** Ergänze `chart` auf einer `default`-Folie (unter dem Text) oder einer
 `text-image`-Folie (ersetzt das Bild – nimm `image` **oder** `chart`, nicht beides). Es ist ein echtes,
@@ -790,6 +797,20 @@ Oder schnell nur Text: `{ "document_id": "<id>", "slide_number": 2, "markdown": 
 Ist `reference_slide` gleich `slide_number`, wird die Folie direkt neu befüllt – so reparierst du eine
 Folie, die noch rohe `{{placeholders}}` zeigt.
 
+**Nur Text ändern (`replace`):** `{ "document_id": "<id>", "slide_number": 3, "replace": [{ "find": "Kunde X",
+"replace_with": "ACME" }] }` ändert wörtlichen, groß-/kleinschreibungsgenauen Text auf der Folie und lässt alles
+andere (Design, Bilder, Diagramme, Notizen) – so personalisierst du eine eingefügte Bibliotheksfolie. Kein Treffer →
+`no_match`, nichts wird geschrieben. Nicht kombinierbar mit `markdown`, `slides`, `reference_slide`.
+
+### `insert_library_slides`
+
+Fügt freigegebene Folien der Folienbibliothek (`slide:<collection>/<id>`, gefunden mit `search_library`
+`kind: "slide"`) unverändert in ein Deck ein, mit eigenem Master, Notizen und Diagrammen: `{ "document_id":
+"<id>", "slides": [{ "ref": "slide:vertrieb/257", "position": 2 }] }` (oder `librechat_file_id`; ohne Ziel ein
+neues Deck aus diesen Folien). `create_powerpoint` und die Layout-Tools nehmen stattdessen Einträge
+`{ "librarySlide": "slide:…" }` in `slides`. Beachte die `notes` (Bildnachweise, nur intern) und `asset_expired`;
+siehe **de-marketing-library**.
+
 ### `read_powerpoint_slides`
 
 ```json
@@ -826,7 +847,8 @@ Foliensatzes (nur `slideNumber`, `title`, `textLines`).
   referenziere ein gespeichertes Diagrammbild als `![chart](doc:<id>)` im Markdown, über einen
   `{%name}`-Bildplatzhalter in einer `{{}}`-Vorlage oder über einen Layout-Bild-Slot (`images`, Weg C).
 - **Bildbibliothek:** Stockfotos, Key Visuals und Icons der Organisation (und eigene des Nutzers).
-  Finde sie mit `list_image_templates` (`search`, `tag`, `orientation`, `aspect_ratio` sortiert nach
+  Alle Arten (Bilder, Icons, Folien) durchsuchst du mit `search_library`, siehe **de-marketing-library**; nur Bilder
+  mit `list_image_templates` (`search`, `tag`, `orientation`, `aspect_ratio` sortiert nach
   Nähe, `limit`); jedes Ergebnis hat `ref` (`"img:<name>"`), Beschreibung, Schlagwörter und
   `aspectRatio`. Übergib das `aspect_ratio` des Zielbereichs (das `aspectRatio` eines Slots aus
   `describe_pptx_template`, 16:9 = 1.78), damit wenig beschnitten wird; einen Kandidaten siehst du dir
@@ -843,6 +865,9 @@ Foliensatzes (nur `slideNumber`, `title`, `textLines`).
     Markdown fällt die Folie auf den Alt-Text zurück.
   - http(s)-Bilder müssen von einem **öffentlich erreichbaren** Host stammen; interne oder private
     Adressen werden abgelehnt.
+  - `icon:<set>/<name>[?color=…]` funktioniert in jedem Bildeingang oben (Markdown, `image`, Layout-`images`,
+    `{%name}` als `{ "icon": "icon:…" }`). Abgelaufene Rechte → `asset_expired`, ein unbekanntes Icon →
+    `unknown_ref`, es wird kein Deck geschrieben.
   - `{%name}`-Vorlagenbilder und Layout-Bild-Slots (`images`) nehmen
     `{ base64 | document_id | librechat_file_id | image_template }`; `images` der Layout-Tools nehmen
     auch die Strings `lc:…`, `doc:…`, `img:…` oder `data:image/…`.
@@ -862,6 +887,9 @@ Foliensatzes (nur `slideNumber`, `title`, `textLines`).
 
 ## 7. Stolperfallen
 
+- **Bibliotheksfolien werden eingefügt, nicht nachgebaut.** Für eine fertige Firmenfolie nimm `insert_library_slides`
+  oder einen `librarySlide`-Eintrag; Namen änderst du mit `update_powerpoint_slide` + `replace`.
+- **Lies die `notes` des Ergebnisses.** Bildnachweise gehören ins Deck, nur-interne Assets nicht nach außen.
 - **Weiche nie auf Weg A aus, wenn ein Corporate-Master gewünscht war.** Wird ein Layout-Aufruf
   abgelehnt, korrigiere den Aufruf – wechsle nicht zu `create_powerpoint`. Dessen Ausgabe nutzt das
   eigene Design, sodass genau das verloren geht, worum gebeten wurde (der Corporate-Master), und ein

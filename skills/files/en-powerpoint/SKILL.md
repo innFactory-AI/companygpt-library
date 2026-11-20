@@ -23,6 +23,8 @@ Everything needed to build, extend and repair `.pptx` decks.
 | `list_my_files`                   | Find a deck the user attached in the chat (`file_id`)               |
 | `list_templates`                  | Find available templates (`type: "potx"`) before building           |
 | `list_image_templates`            | Find images in the image library (`img:<name>`)                     |
+| `search_library`                  | Search images, icons **and library slides** by meaning (**en-marketing-library**) |
+| `insert_library_slides`           | Put approved library slides unchanged into a deck, in place         |
 | `embed_chart_in_document`         | Chart.js chart as a new deck; `title` adds a title slide            |
 
 ---
@@ -256,6 +258,11 @@ The `image` field takes `lc:<file_id>` (chat attachment or generated image, see 
 `imageFit` sets how it fills its area: `"contain"` (default, whole image, centred), `"cover"` (fills the
 area, crops) or `"stretch"` (distorts — only on request). The same holds in `append_slides_to_powerpoint`
 and `update_powerpoint_slide`.
+
+**Icons:** `image` and Markdown also take `icon:<set>/<name>` (optional `?color=brand` or `?color=RRGGBB`, one-colour
+icons only), shown as a sharp vector. **Feature/process slide:** `iconGrid` (3–6 items `{icon, title, text}`, optional
+`columns`, `color`) under the slide title; `type` is still required, use `"default"`. Find icons with `search_library`;
+details in **en-marketing-library**.
 
 **Native chart on a slide:** add `chart` to a `default` slide (below the text) or a `text-image` slide
 (replaces the image — use `image` **or** `chart`, not both). It is a real, editable PowerPoint chart
@@ -769,6 +776,19 @@ Or quick text-only: `{ "document_id": "<id>", "slide_number": 2, "markdown": "##
 When `reference_slide` equals `slide_number`, the slide is refilled in place — the way to fix a
 slide that still shows raw `{{placeholders}}`.
 
+**Edit text only (`replace`):** `{ "document_id": "<id>", "slide_number": 3, "replace": [{ "find": "Customer X",
+"replace_with": "ACME" }] }` changes literal, case-sensitive text on the slide and keeps everything else (design,
+pictures, charts, notes) — the way to personalise an inserted library slide. No hit → `no_match`, nothing written. Not
+combinable with `markdown`, `slides`, `reference_slide`.
+
+### `insert_library_slides`
+
+Puts approved slides of the slide library (`slide:<collection>/<id>`, found with `search_library` `kind: "slide"`)
+unchanged into a deck, with their own master, notes and charts: `{ "document_id": "<id>", "slides": [{ "ref":
+"slide:sales/257", "position": 2 }] }` (or `librechat_file_id`; without a target a new deck from these slides).
+`create_powerpoint` and the layout tools take `{ "librarySlide": "slide:…" }` entries in `slides` instead. Respect
+the `notes` (credits, internal only) and `asset_expired`; see **en-marketing-library**.
+
 ### `read_powerpoint_slides`
 
 ```json
@@ -803,7 +823,8 @@ the keys still free. Pass `include_layouts: false` for a text-only read of a ver
   chart image as `![chart](doc:<id>)` in Markdown, through a `{%name}` image placeholder in a `{{}}`
   template, or through a layout picture slot (`images`, path C).
 - **Image library:** the organisation's (and the user's own) stock photos, key visuals and icons.
-  Find them with `list_image_templates` (`search`, `tag`, `orientation`, `aspect_ratio` sorts by
+  Search all kinds (images, icons, slides) with `search_library`, see **en-marketing-library**; images only with
+  `list_image_templates` (`search`, `tag`, `orientation`, `aspect_ratio` sorts by
   closeness, `limit`); each result has `ref` (`"img:<name>"`), description, tags and `aspectRatio`.
   Pass `aspect_ratio` of the target area (a slot's `aspectRatio` from `describe_pptx_template`, 16:9 =
   1.78) so little is cropped; look at a candidate with `view_image { "image_template": "<name>" }`.
@@ -819,6 +840,8 @@ the keys still free. Pass `include_layouts: false` for a text-only read of a ver
     back to the alt text.
   - http(s) images must come from a **publicly reachable** host; internal or private addresses
     are refused.
+  - `icon:<set>/<name>[?color=…]` works in every image input above (Markdown, `image`, layout `images`, `{%name}` as
+    `{ "icon": "icon:…" }`). Expired rights → `asset_expired`, an unknown icon → `unknown_ref`, no deck is written.
   - `{%name}` template images and layout picture slots (`images`) take
     `{ base64 | document_id | librechat_file_id | image_template }`; layout `images` also take the
     strings `lc:…`, `doc:…`, `img:…` or `data:image/…`.
@@ -837,6 +860,9 @@ the keys still free. Pass `include_layouts: false` for a text-only read of a ver
 
 ## 7. Gotchas
 
+- **Library slides are inserted, not rebuilt.** For a ready-made company slide use `insert_library_slides` or a
+  `librarySlide` entry; change names with `update_powerpoint_slide` + `replace`.
+- **Read the `notes` of the result.** Credit texts must go into the deck, internal-only assets must not go external.
 - **Never fall back to path A when a corporate master was requested.** If a layout call is
   rejected, fix the call — do not switch to `create_powerpoint`. Its output uses the built-in
   design, so the one thing that was asked for (the corporate master) is exactly what is lost, and

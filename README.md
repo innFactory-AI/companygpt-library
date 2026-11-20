@@ -71,6 +71,7 @@ The agent picks a skill up when a request matches its `description`. Placeholder
 | Convert · Konvertierung | [`de-convert`](skills/files/de-convert/SKILL.md) | [`en-convert`](skills/files/en-convert/SKILL.md) |
 | Excel | [`de-excel`](skills/files/de-excel/SKILL.md) | [`en-excel`](skills/files/en-excel/SKILL.md) |
 | File Management · Dateiverwaltung | [`de-file-management`](skills/files/de-file-management/SKILL.md) | [`en-file-management`](skills/files/en-file-management/SKILL.md) |
+| Marketing Library · Marketing-Bibliothek | [`de-marketing-library`](skills/files/de-marketing-library/SKILL.md) | [`en-marketing-library`](skills/files/en-marketing-library/SKILL.md) |
 | PDF | [`de-pdf`](skills/files/de-pdf/SKILL.md) | [`en-pdf`](skills/files/en-pdf/SKILL.md) |
 | PowerPoint | [`de-powerpoint`](skills/files/de-powerpoint/SKILL.md) | [`en-powerpoint`](skills/files/en-powerpoint/SKILL.md) |
 | Settings & UI · Einstellungen & UI | [`de-settings-ui`](skills/files/de-settings-ui/SKILL.md) | [`en-settings-ui`](skills/files/en-settings-ui/SKILL.md) |
