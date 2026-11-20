@@ -1,7 +1,7 @@
 # companyGPT Library
 
 Ready-made content for companyGPT that customers can take as it is: agent skills and agents in German and
-English, plus curated admin defaults. 76 skills across 12 categories, each in both languages.
+English, plus curated admin defaults. 78 skills across 13 categories, each in both languages.
 
 Each skill is a self-contained prompt that teaches an agent one job: how to run a QBR, prep a deployment, audit SEO,
 or query a companyRAG collection. They are prompt-first: every skill works without code execution and is designed
@@ -49,6 +49,13 @@ The agent picks a skill up when a request matches its `description`. Placeholder
 | --- | --- | --- |
 | Tool Search · Tool-Suche | [`de-tool-search`](skills/generic/de-tool-search/SKILL.md) | [`en-tool-search`](skills/generic/en-tool-search/SKILL.md) |
 | File Routing · Datei-Routing | [`de-file-routing`](skills/generic/de-file-routing/SKILL.md) | [`en-file-routing`](skills/generic/en-file-routing/SKILL.md) |
+
+### Skills & Agents · Skills & Agenten
+
+| Skill | DE | EN |
+| --- | --- | --- |
+| Create Skill · Skill erstellen | [`de-create-skill`](skills/skills-and-agents/de-create-skill/SKILL.md) | [`en-create-skill`](skills/skills-and-agents/en-create-skill/SKILL.md) |
+| Agent Design · Agenten-Design | [`de-agent-design`](skills/skills-and-agents/de-agent-design/SKILL.md) | [`en-agent-design`](skills/skills-and-agents/en-agent-design/SKILL.md) |
 
 ### companyRAG
 

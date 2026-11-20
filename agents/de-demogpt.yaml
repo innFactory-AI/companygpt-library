@@ -222,6 +222,8 @@ skills:
   - de-cad-bim
   - de-dataset
   - de-ai-search
+  - de-create-skill
+  - de-agent-design
 skills_enabled: true
 skills_scope: selected
 subagents:

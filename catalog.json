@@ -24,6 +24,17 @@
       ]
     },
     {
+      "id": "skills-and-agents",
+      "label": {
+        "de": "Skills & Agenten",
+        "en": "Skills & Agents"
+      },
+      "skills": [
+        "create-skill",
+        "agent-design"
+      ]
+    },
+    {
       "id": "company-rag",
       "label": {
         "de": "companyRAG",
