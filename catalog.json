@@ -30,6 +30,7 @@
         "en": "Skills & Agents"
       },
       "skills": [
+        "use-case-advisor",
         "create-skill",
         "agent-design"
       ]

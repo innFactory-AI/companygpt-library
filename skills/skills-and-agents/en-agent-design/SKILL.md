@@ -41,6 +41,8 @@ Ask (a few questions at a time, with `ask_user_question` if available):
 | A different specialist who should take over the conversation with the user | **Handoff** (Step 3) |
 
 Rule of thumb: if two agents would need the same instructions, those instructions belong in a skill both use.
+If it is unclear which companyGPT apps fit the job (companyRAG, companyFILES, companyM365, …), see
+**en-use-case-advisor**.
 
 ## Step 3: Decide How Many Agents
 

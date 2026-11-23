@@ -44,6 +44,8 @@ Frag (immer nur wenige Fragen auf einmal, mit `ask_user_question`, falls verfüg
 | Ein anderer Spezialist soll das Gespräch mit dem Nutzer übernehmen | **Übergabe** (Schritt 3) |
 
 Faustregel: Bräuchten zwei Agenten dieselben Anweisungen, gehören diese Anweisungen in einen Skill, den beide nutzen.
+Ist unklar, welche companyGPT-Apps zur Aufgabe passen (companyRAG, companyFILES, companyM365, …), siehe
+**de-use-case-advisor**.
 
 ## Schritt 3: Über die Zahl der Agenten entscheiden
 
