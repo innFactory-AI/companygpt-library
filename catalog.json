@@ -56,6 +56,16 @@
       ]
     },
     {
+      "id": "company-m365",
+      "label": {
+        "de": "companyM365",
+        "en": "companyM365"
+      },
+      "skills": [
+        "m365-mail"
+      ]
+    },
+    {
       "id": "files",
       "label": {
         "de": "companyFILES",

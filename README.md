@@ -70,6 +70,12 @@ The agent picks a skill up when a request matches its `description`. Placeholder
 | --- | --- | --- |
 | Course Authoring · Kurse erstellen | [`de-course-authoring`](skills/company-learn/de-course-authoring/SKILL.md) | [`en-course-authoring`](skills/company-learn/en-course-authoring/SKILL.md) |
 
+### companyM365
+
+| Skill | DE | EN |
+| --- | --- | --- |
+| Outlook Mail · Outlook-Mail | [`de-m365-mail`](skills/company-m365/de-m365-mail/SKILL.md) | [`en-m365-mail`](skills/company-m365/en-m365-mail/SKILL.md) |
+
 ### companyFILES
 
 | Skill | DE | EN |
