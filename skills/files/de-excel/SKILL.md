@@ -7,6 +7,8 @@ description: 'Erstelle, lies und bearbeite Excel-Tabellen (.xlsx) mit companyFIL
 
 Tools zum Erstellen, Lesen und Bearbeiten von Excel-Tabellen (.xlsx) über companyFILES.
 
+> **Office-Add-in:** Stehen `excel_*`-Tools in deiner Tool-Liste, läuft der Chat in Excel und dort ist ein Dokument geöffnet. Meint der Nutzer die geöffnete Arbeitsmappe, arbeite mit diesen Tools darin statt mit diesem Skill. Dieser Skill ist für neue Dateien zum Herunterladen (siehe de-file-routing).
+
 ## Tools in diesem Skill
 
 | Tool                     | Zweck                                                                                       |

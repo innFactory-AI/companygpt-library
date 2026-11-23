@@ -25,13 +25,15 @@ Attached files in this message:
 
 Prüfe deine Tool-Liste, bevor du einen Weg wählst. Apps (companyFILES, companyRAG, companyTRANSCRIBE, companyTRANSLATE, companyM365) sind nur da, wenn sie für diesen Tenant und Agenten aktiviert sind. Code-Ausführung ist nur da, wenn sie für den Chat oder Agenten aktiviert und für die Rolle des Nutzers erlaubt ist. Fehlt ein Weg, nimm die Alternative aus der Tabelle oder sag dem Nutzer, was fehlt.
 
+**Office-Add-in:** Stehen `word_*`-, `excel_*`-, `ppt_*`- oder `outlook_*`-Tools in deiner Tool-Liste, läuft der Chat im companyGPT-Bereich in Word, Excel, PowerPoint oder Outlook, und dort ist ein Dokument geöffnet. Meint der Nutzer *dieses* Dokument („diese Präsentation“, „die Tabelle hier“, „meine Antwort“), arbeite mit diesen Tools darin. Die companyFILES-`create_*`-Tools nimm nur, wenn der Nutzer eine neue, eigene Datei zum Herunterladen möchte.
+
 ## Schritt 3: Weg wählen
 
 | Aufgabe | Weg | Alternative / Bedingung |
 | --- | --- | --- |
 | Natives Word-, Excel-, PowerPoint- oder PDF-Dokument erstellen | companyFILES-`create_*`-Tools (siehe Word-, Excel-, PowerPoint-, PDF-Skill) | Ohne companyFILES: Inhalt als Markdown im Chat liefern |
 | Angehängte DOCX, XLSX, PDF oder PPTX lesen | companyFILES `read_word`, `read_excel`, `read_pdf`, `read_powerpoint_slides` mit `librechat_file_id` | Kurze Textdateien sind oft schon in deinem Kontext |
-| Berechnungen, Filter, Pivots oder Statistik auf einer angehängten CSV/XLSX | Code-Ausführung (pandas auf `/mnt/data/<dateiname>`), siehe unten | Ohne Code-Ausführung: companyFILES `read_excel` (CSV: `read_file`, falls verfügbar) und über die Werte schlussfolgern; bei großen Dateien sagen, dass das Ergebnis auf dem gelesenen Ausschnitt beruht |
+| Berechnungen, Filter, Pivots oder Statistik auf einer angehängten CSV/XLSX | Code-Ausführung (pandas auf `/mnt/data/<dateiname>`), siehe unten | Ohne Code-Ausführung: companyFILES `read_excel` (CSV: companyFILES `read_file`, falls verfügbar) und über die Werte schlussfolgern; bei großen Dateien sagen, dass das Ergebnis auf dem gelesenen Ausschnitt beruht |
 | Diagramm aus angehängten Daten | **Im Chat:** companyFILES `show_interactive_chart`. **In einer PowerPoint:** natives, bearbeitbares Diagramm über companyFILES `slides[].chart` (`create_powerpoint`, `append_slides_to_powerpoint`, `update_powerpoint_slide`) oder `charts` (Layout-Tools), siehe PowerPoint-Skill. **In Word/PDF:** Bild über `create_chart_document` / `embed_chart_in_document` (nicht ODT: Diagramm zuerst als Bild rendern und einbetten, siehe de-word-odt). Alternativ Code-Ausführung (matplotlib/plotly) für ein Bild | Ohne Code-Ausführung: Werte mit `read_excel` lesen, dann die companyFILES-Diagramm-Tools |
 | Firmenvorlage ausfüllen | companyFILES `list_templates` + `create_*_from_template` (Vorlagen-Skill) | — |
 | Massen- oder freie Änderungen im Layout einer Vorlage | companyFILES `attach_template_to_chat`, dann Code-Ausführung ab der **nächsten** Nachricht des Nutzers (Vorlagen-Skill) | Braucht Code-Ausführung und LibreChat-Dateispeicher für companyFILES; sonst `create_*_from_template` plus die iterativen Bearbeitungstools |
@@ -43,9 +45,25 @@ Prüfe deine Tool-Liste, bevor du einen Weg wählst. Apps (companyFILES, company
 | Audio- oder Videodatei (MP3, WAV, M4A, MP4, MOV, …) | companyTRANSCRIBE `transcribe_chat_file { "file_id": "…" }`, dann `get_transcript_stats` bis fertig, dann `get_transcript` | Nur, wenn companyTRANSCRIBE aktiviert ist; die Transkription dauert Minuten |
 | Angehängtes Dokument übersetzen | companyTRANSLATE `translate_document { "file_id": "…", "target_language": "…" }` (Status `running`: `get_translation_status { "job_id": "…" }`) | Nur, wenn companyTRANSLATE aktiviert ist; sonst den ausgelesenen Text selbst übersetzen und mit companyFILES ein neues Dokument erstellen |
 | Text übersetzen | companyTRANSLATE `translate_text { "text": "…", "target_language": "…" }` | Ohne companyTRANSLATE: selbst übersetzen |
-| Outlook-Mails und -Anhänge, Teams-Nachrichten, OneDrive-/SharePoint-Dateien | companyM365 (z. B. `search_emails`, `read_email_attachment`, `search_teams_messages`, `search_files`) | Nur, wenn companyM365 aktiviert ist; sonst den Nutzer bitten, die Datei anzuhängen |
+| Im geöffneten Dokument des Office-Add-ins arbeiten (bearbeiten, formatieren, Folien ergänzen, in die offene Mail schreiben) | Die Add-in-Tools dieser App: `word_*`, `excel_*`, `ppt_*`, `outlook_*` | Nur im Add-in. Nicht für eine neue Datei zum Herunterladen: das ist companyFILES |
+| Outlook-Mails und ihre Anhänge | companyM365 `search_emails` / `get_email`, dann `read_email_attachment { "messageId": "…", "attachmentId": "…" }` (siehe de-m365-mail) | Nur, wenn companyM365 aktiviert ist. Eine im Chat angehängte `.msg`-/`.eml`-Datei ist keine Outlook-Mail: companyFILES `read_file` |
+| Teams-Nachrichten | companyM365 `search_teams_messages` | Nur, wenn companyM365 aktiviert ist |
+| Eine Datei in OneDrive oder SharePoint | companyM365 `search_files` (OneDrive) oder `microsoft_search` (SharePoint-Sites), dann companyM365 `read_file` mit `id` **und** `driveId` (aus `parentReference.driveId`) oder mit der Freigabe-`url`. Geschlossene Excel-Dateien: `workbook_get_overview`, `workbook_read_range` | Nur, wenn companyM365 aktiviert ist; sonst den Nutzer bitten, die Datei anzuhängen. Die companyFILES-Tools können keine OneDrive-/SharePoint-Dateien öffnen |
+| Eine Datei an eine E-Mail anhängen | companyM365 `attach_file_to_draft` an einen Entwurf, mit genau einer Quelle: `chatFileId` (Datei aus diesem Chat), `documentId` (companyFILES), `fileUrl` (OneDrive/SharePoint) | Nur Entwürfe, nie Versand. Siehe de-m365-mail |
 
 companyRAG kann keine im Chat angehängten Dateien indexieren. Für eine Ad-hoc-Frage zu einer angehängten Datei nimm die companyFILES-Lesetools oder Code-Ausführung. Sollen die Daten dauerhaft oder für andere durchsuchbar sein, müssen sie über die companyRAG-Oberfläche oder von einem Admin in eine companyRAG-Collection bzw. ein Dataset aufgenommen werden.
+
+## Drei Tools namens `read_file`
+
+Bis zu drei Tools mit diesem Namen können in deiner Tool-Liste stehen. Sie lesen aus verschiedenen Quellen und ersetzen einander nicht. Die App steht im Tool-Namen (z. B. `read_file_mcp_Files`, `read_file_mcp_Microsoft365`; der Servername hängt vom Tenant ab), das eingebaute hat kein Suffix.
+
+| Tool | Parameter | Liest |
+| --- | --- | --- |
+| eingebautes `read_file` (ohne Suffix) | `path` | Dateien, die zu einem Skill gehören (`<skill-name>/references/…`), und mit Code-Ausführung Dateien in der Sandbox. Nie eine `file_id` |
+| companyFILES `read_file` | `librechat_file_id` oder `document_id`, optional `part`, `offset` | Im Chat angehängte Dateien und companyFILES-Dokumente in Formaten, die die anderen Lesetools nicht abdecken (`.msg`, `.eml`, ZIP, `.doc`, `.xls`, `.ppt`, ODF, Scans). Nur, falls verfügbar |
+| companyM365 `read_file` | genau eins von `id` (+ `driveId`), `url`, `documentId`; `format` `text` oder `markdown` | OneDrive- und SharePoint-Dateien. Liest keine Chat-Anhänge |
+
+Wähle nach dem Ort der Datei: im Chat angehängt → companyFILES; in OneDrive/SharePoint → companyM365; Teil eines Skills → eingebaut. Für DOCX, XLSX, PDF und PPTX aus dem Chat gehen die spezifischen companyFILES-Lesetools (`read_word`, `read_excel`, …) vor.
 
 ## Optional: Wenn Code-Ausführung verfügbar ist
 
