@@ -15,13 +15,14 @@ agent only has when the skill is installed as a package (zip), not when just `SK
 catalog.json                                 # skill categories, order, docs index texts
 skills/<category>/<locale>-<id>/SKILL.md     # one skill per language: skills/files/de-excel, skills/files/en-excel
 skills/<category>/<locale>-<id>/references/  # optional bundled files (part of the skill package)
-agents/<locale>-<slug>.yaml                  # ready-made agents (DemoGPT, Researcher) per language
+agents/<locale>-<slug>.md                    # ready-made agents (CompanyGPT, CompanyGPT Researcher) per language
 admin/model-labels/                          # curated model labels per language (entered in companyADMIN)
 ```
 
 Skill names carry the language as a prefix (`de-excel`, `en-excel`), so both languages can be installed in the
-same companyGPT at the same time. Agents do the same (`agent_de_demogpt`, `agent_en_demogpt`) and use the skills of
-their language.
+same companyGPT at the same time. Agents do the same (`agent_de_companygpt`, `agent_en_companygpt`) and use the skills of
+their language. An agent is one Markdown file: the companyGPT agent settings as frontmatter, the instructions as
+the body (companyADMIN 3.20.0 or later).
 
 This repo is the single source for the skills on [docs.company-gpt.com](https://docs.company-gpt.com)
 (Tutorials → Skills). The docs build generates its skill pages from `main`, and every push to `main` redeploys the
@@ -202,8 +203,8 @@ The agent picks a skill up when a request matches its `description`. Placeholder
 
 | Agent | DE | EN |
 | --- | --- | --- |
-| DemoGPT: all-round agent with the key tools and skills | [`de-demogpt.yaml`](agents/de-demogpt.yaml) | [`en-demogpt.yaml`](agents/en-demogpt.yaml) |
-| Researcher · Recherche-Agent: web research subagent of DemoGPT | [`de-researcher.yaml`](agents/de-researcher.yaml) | [`en-researcher.yaml`](agents/en-researcher.yaml) |
+| CompanyGPT: all-round agent with the key tools and skills | [`de-companygpt.md`](agents/de-companygpt.md) | [`en-companygpt.md`](agents/en-companygpt.md) |
+| CompanyGPT Researcher: web research subagent of CompanyGPT | [`de-companygpt-researcher.md`](agents/de-companygpt-researcher.md) | [`en-companygpt-researcher.md`](agents/en-companygpt-researcher.md) |
 
 ## License
 
