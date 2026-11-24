@@ -17,13 +17,13 @@ not be installed side by side.
 catalog.json                                  # skill categories, order (by <id>), index texts (DE/EN)
 skills/<category>/<locale>-<id>/SKILL.md      # the skill: what users upload in companyGPT under "Skills"
 skills/<category>/<locale>-<id>/references/…  # optional bundled files (Markdown recipes; optionally scripts/…)
-agents/<locale>-<slug>.yaml                   # ready-made companyGPT agent exports
+agents/<locale>-<slug>.md                     # ready-made companyGPT agents (agent markdown)
 admin/model-labels/<locale>.yaml              # curated model labels for companyADMIN, README.md explains them
 scripts/validate.mjs                          # `npm run validate`, runs in CI
 ```
 
 - `<locale>` is `de` or `en`. **The locale is part of every name**, so both languages can live in one companyGPT:
-  skill `de-excel` / `en-excel`, agent id `agent_de_demogpt` / `agent_en_demogpt`. Every skill exists in both
+  skill `de-excel` / `en-excel`, agent id `agent_de_companygpt` / `agent_en_companygpt`. Every skill exists in both
   locales with the same `<id>`, in the same `<category>` folder.
 - `<category>` groups skills by domain (`files`, `sales`, …). Library Sync finds skills at any depth, so the category
   is not part of the name; moving a skill to another category keeps its identity (the docs URL changes, though).
@@ -72,11 +72,17 @@ in innFactory-AI/docs (see its `AGENTS.md`). A new skill works without one: the 
 from the `SKILL.md` heading and its description from the first sentence of `description`. Add the intro with a docs PR
 on a branch with the same name; this repo's CI builds the docs against it.
 
-### agents/<locale>-<slug>.yaml
+### agents/<locale>-<slug>.md
 
-companyGPT agent exports (Library Sync format). The `id` is the identity in Library Sync and must be
-`agent_<locale>_<slug>`; never change it once released. DE and EN files share the same tools, MCP servers and
-settings; only `name`, `description`, `instructions` and the locale of `skills:` / `subagents.agent_ids` differ. Every
+companyGPT agents as agent markdown (Library Sync, companyADMIN 3.20.0 or later): the frontmatter holds every agent
+setting a companyGPT export has (`id`, `name`, `description`, `provider`, `model`, `tools`, `mcpServerNames`, `skills`,
+`subagents`, …), the body is the `instructions`. The `id` in the frontmatter is what makes the file an agent (a `.md`
+without one is read as a plain Claude Code subagent). It is the identity in Library Sync and must be
+`agent_<locale>_<slug>` with the file's slug (`-` → `_`); never change it once released. No `avatar`: an uploaded
+avatar path only exists in the tenant it came from. Write the instructions so any customer can use them unchanged:
+no tenant, customer or person names, and tools named with "if available" where a tenant may not have them. DE and EN
+files share the same tools, MCP servers and settings; only `name`, `description`, the body and the locale of
+`skills:` / `subagents.agent_ids` differ. Every
 name under `skills:` must be a skill of the same locale in this repo, and every subagent id an agent of the same
 locale.
 

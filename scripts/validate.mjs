@@ -2,7 +2,7 @@
 // Checks the repo layout before the docs build or companyADMIN Library Sync ever sees it.
 //
 //   skills/<category>/<locale>-<id>/SKILL.md   name == folder, locale prefix, both locales, listed under <category>
-//   agents/<locale>-<slug>.yaml                unique ids, skills/subagents resolve within the same locale
+//   agents/<locale>-<slug>.md                  agent markdown: id agent_<locale>_<slug>, skills/subagents within the locale
 //   admin/model-labels/<locale>.yaml           same models and groups in every locale
 //
 // Usage: npm run validate
@@ -81,22 +81,29 @@ for (const [id, cat] of listed) {
 	}
 }
 
-// agents/
+// agents/ (agent markdown, companyADMIN 3.20.0: every agent field in the frontmatter, the instructions as the body)
 const agents = [];
 for (const f of existsSync(join(root, 'agents')) ? readdirSync(join(root, 'agents')) : []) {
-	if (!/\.ya?ml$/.test(f)) continue;
 	const rel = `agents/${f}`;
-	const L = f.slice(0, 2);
-	if (!LOCALES.includes(L) || f[2] !== '-') fail(`${rel}: file name must start with <${LOCALES.join('|')}>-`);
-	let a;
-	try {
-		a = parse(read(rel));
-	} catch (e) {
-		fail(`${rel}: not valid YAML (${e.message.split('\n')[0]})`);
+	if (/\.ya?ml$/.test(f)) {
+		fail(`${rel}: agents are agent markdown now (agents/<locale>-<slug>.md)`);
 		continue;
 	}
-	if (!a?.id || !a?.name) fail(`${rel}: needs id and name`);
-	else if (!a.id.startsWith(`agent_${L}_`)) fail(`${rel}: id must start with agent_${L}_`);
+	if (!f.endsWith('.md') || f === 'README.md') continue;
+	const m = f.match(/^([a-z]{2})-([a-z0-9][a-z0-9-]*)\.md$/);
+	if (!m || !LOCALES.includes(m[1])) {
+		fail(`${rel}: file name must be <${LOCALES.join('|')}>-<slug>.md`);
+		continue;
+	}
+	const [, L, slug] = m;
+	const a = frontmatter(rel);
+	const body = read(rel).replace(/^---\n[\s\S]*?\n---\n?/, '').trim();
+	const id = `agent_${L}_${slug.replace(/-/g, '_')}`;
+	if (!a.id || !a.name) fail(`${rel}: frontmatter needs id and name`);
+	else if (a.id !== id) fail(`${rel}: id must be ${id} (is ${a.id})`);
+	if ('instructions' in a) fail(`${rel}: instructions belong in the body, not in the frontmatter`);
+	if (!body) fail(`${rel}: body (the instructions) is empty`);
+	if ('avatar' in a) fail(`${rel}: no avatar (an uploaded avatar path only exists in the tenant it came from)`);
 	agents.push({ rel, L, a });
 }
 const agentIds = new Map();
