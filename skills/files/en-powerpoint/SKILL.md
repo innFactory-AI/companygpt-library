@@ -7,6 +7,8 @@ description: 'Build and refine PowerPoint (.pptx) presentations with companyFILE
 
 Everything needed to build, extend and repair `.pptx` decks.
 
+> **Office add-in:** if `ppt_*` tools are in your tool list, the chat runs inside PowerPoint and a document is open there. When the user means the open deck, work in it with those tools instead of this skill. This skill is for new files to download (see en-file-routing).
+
 ## Tool map
 
 | Tool                              | Purpose                                                             |

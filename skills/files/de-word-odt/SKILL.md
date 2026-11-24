@@ -7,6 +7,8 @@ description: 'Erstellt und liest Word- (.docx) und ODT-Dokumente (.odt) mit comp
 
 Tools zum Erstellen von Word- (.docx) und ODT-Dokumenten (.odt) sowie zum Lesen von Word-Dateien.
 
+> **Office-Add-in:** Stehen `word_*`-Tools in deiner Tool-Liste, läuft der Chat in Word und dort ist ein Dokument geöffnet. Meint der Nutzer das geöffnete Dokument, arbeite mit diesen Tools darin statt mit diesem Skill. Dieser Skill ist für neue Dateien zum Herunterladen (siehe de-file-routing).
+
 ## Tools in diesem Skill
 
 | Tool                    | Zweck                                                                                       |

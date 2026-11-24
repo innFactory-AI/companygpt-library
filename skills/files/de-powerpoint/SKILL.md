@@ -7,6 +7,8 @@ description: 'Erstellt und überarbeitet PowerPoint-Präsentationen (.pptx) mit 
 
 Alles, was du brauchst, um `.pptx`-Foliensätze zu erstellen, zu erweitern und zu reparieren.
 
+> **Office-Add-in:** Stehen `ppt_*`-Tools in deiner Tool-Liste, läuft der Chat in PowerPoint und dort ist ein Dokument geöffnet. Meint der Nutzer die geöffnete Präsentation, arbeite mit diesen Tools darin statt mit diesem Skill. Dieser Skill ist für neue Dateien zum Herunterladen (siehe de-file-routing).
+
 ## Tool-Übersicht
 
 | Tool                              | Zweck                                                                                |

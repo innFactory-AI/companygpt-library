@@ -7,6 +7,8 @@ description: 'Create and read Word (.docx) and ODT (.odt) documents with company
 
 Tools for creating Word (.docx) and ODT (.odt) documents, plus reading Word files.
 
+> **Office add-in:** if `word_*` tools are in your tool list, the chat runs inside Word and a document is open there. When the user means the open document, work in it with those tools instead of this skill. This skill is for new files to download (see en-file-routing).
+
 ## Tools in This Skill
 
 | Tool                    | Purpose                                                                         |

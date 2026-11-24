@@ -7,6 +7,8 @@ description: 'Create, read, and modify Excel (.xlsx) spreadsheets with companyFI
 
 Tools for creating, reading, and modifying Excel (.xlsx) spreadsheets via companyFILES.
 
+> **Office add-in:** if `excel_*` tools are in your tool list, the chat runs inside Excel and a document is open there. When the user means the open workbook, work in it with those tools instead of this skill. This skill is for new files to download (see en-file-routing).
+
 ## Tools in This Skill
 
 | Tool                     | Purpose                                                                        |
