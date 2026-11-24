@@ -52,7 +52,8 @@ A skill holds **procedural knowledge**: how this organisation does a job. Check 
 | A permanent persona with its own model, tools and instructions for a team | An agent (see **en-agent-design**), which then uses this skill |
 | How to do a recurring job, with steps, rules and an output format | **A skill** |
 
-Often the answer is a combination: the MCP server provides access, the skill says how to use it.
+Often the answer is a combination: the MCP server provides access, the skill says how to use it. If it is unclear
+which apps fit the job at all, work it out first with **en-use-case-advisor**.
 
 ## Step 3: Check the Tools
 

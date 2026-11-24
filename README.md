@@ -54,6 +54,7 @@ The agent picks a skill up when a request matches its `description`. Placeholder
 
 | Skill | DE | EN |
 | --- | --- | --- |
+| Use-Case Advisor · Anwendungsfall-Berater | [`de-use-case-advisor`](skills/skills-and-agents/de-use-case-advisor/SKILL.md) | [`en-use-case-advisor`](skills/skills-and-agents/en-use-case-advisor/SKILL.md) |
 | Create Skill · Skill erstellen | [`de-create-skill`](skills/skills-and-agents/de-create-skill/SKILL.md) | [`en-create-skill`](skills/skills-and-agents/en-create-skill/SKILL.md) |
 | Agent Design · Agenten-Design | [`de-agent-design`](skills/skills-and-agents/de-agent-design/SKILL.md) | [`en-agent-design`](skills/skills-and-agents/en-agent-design/SKILL.md) |
 

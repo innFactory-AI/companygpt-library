@@ -57,7 +57,8 @@ Ein Skill enthält **Ablaufwissen**: wie diese Organisation eine Aufgabe erledig
 | Eine feste Rolle mit eigenem Modell, eigenen Tools und Anweisungen für ein Team | Ein Agent (siehe **de-agent-design**), der dann diesen Skill nutzt |
 | Wie eine wiederkehrende Aufgabe erledigt wird, mit Schritten, Regeln und Ausgabeformat | **Ein Skill** |
 
-Oft ist es eine Kombination: Der MCP-Server liefert den Zugriff, der Skill sagt, wie man ihn nutzt.
+Oft ist es eine Kombination: Der MCP-Server liefert den Zugriff, der Skill sagt, wie man ihn nutzt. Ist unklar,
+welche Apps überhaupt zur Aufgabe passen, kläre das zuerst mit **de-use-case-advisor**.
 
 ## Schritt 3: Die Tools prüfen
 
