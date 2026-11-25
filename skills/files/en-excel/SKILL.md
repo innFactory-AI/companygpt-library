@@ -52,29 +52,66 @@ A spreadsheet the user attached appears in the `Attached files in this message:`
 Apply these to every workbook people read, print or pass on (analyses, comparisons, offers, cost calculations,
 management summaries). A plain data export (`create_excel_from_csv` / `_json`) does not need them.
 
-- **Sheet order:** overview/management summary → detail sheets → comparison / pros and cons → findings and next steps →
-  assumptions and sources.
-- **Title area:** every sheet gets `title` and a `subtitle` with scope, date and basis ("As of 25 Nov 2026 · all prices
-  net"). Never put the title into a header cell or an all-caps "section" row.
-- **Calculate, don't type:** put every parameter in an **assumptions sheet**, one labelled cell per value with a source
-  column. Formulas reference it absolutely (`Assumptions!$B$4`); the overview links to the detail sheets
-  (`Sites!G21`). **Never type in a computed result.** Totals are `SUM` formulas.
+**What comes first:**
+
+1. **Follow the user's instructions to the letter:** sheet names, column headers, order and formulas exactly as they
+   give them. A nicer layout that calculates something else misses the task.
+2. **Existing file: its own style wins** over every rule here. Find the input cells first (they usually stand out by
+   their own font colour or fill), write only there and leave existing formulas unchanged.
+3. **Only as much structure as the content needs.** A simple list gets a title, number formats and totals, but no
+   assumptions sheet and no chart. The full structure below is meant for multi-part analyses.
+
+**Structure and calculation:**
+
+- **Sheet order** (for multi-part analyses): overview/management summary → detail sheets → comparison / pros and cons →
+  findings and next steps → assumptions and sources. Leave out what doesn't exist.
+- **Title area:** every report sheet gets `title` and a `subtitle` with scope, date and basis ("As of 25 Nov 2026 ·
+  all prices net"). Never put the title into a header cell or an all-caps "section" row.
+- **Calculate, don't type:** every parameter sits in its own labelled cell, for analyses on an **assumptions sheet**
+  with a source column. Formulas reference it absolutely (`Assumptions!$B$4`, never `B5*1.05`); the overview links to
+  the detail sheets (`Sites!G21`). **Never type in a computed result.** Totals are `SUM` formulas.
+- **Same formula across the whole row:** periods and sites all follow the same pattern. A single cell that deviates in
+  the middle of a row is the most common error nobody notices. Catch denominators that can be 0 (`IFERROR(B5/C5,0)`).
+- **Origin of every fixed number:** every number you enter gets a source where the reader sees it (source column, note
+  or cell comment). If it came from the user, say so ("provided by the user").
+- **Formulas that calculate everywhere:** English function names and comma as separator (`SUM`, `IF`, `IFERROR`).
+  Prefer well-established functions such as `SUMIFS`, `INDEX`/`MATCH`, `IFERROR`, `SUMPRODUCT`. **No** `XLOOKUP`,
+  `XMATCH`, `FILTER`, `SORT`, `UNIQUE` or `SEQUENCE`: older Excel versions, LibreOffice and previews don't calculate
+  them, and spilled results only land in the first cell. Look up with `INDEX`/`MATCH`; sort and filter the data
+  beforehand. `TEXTJOIN`, `CONCAT`, `IFS`, `SWITCH`, `MAXIFS` and `MINIFS` only work with the prefix `_xlfn.`
+  (`_xlfn.IFS(…)`), otherwise Excel shows `#NAME?`.
+- **Sheet names with spaces** are quoted in references: `'Assumptions 2026'!$B$4` (without quotes: `#VALUE!`).
+
+**Formats and look:**
+
 - **Number formats on every numeric cell, formula and total cells included** (otherwise Excel shows `19380` instead of
   `19,380 €`). Put the unit in the header ("Cost (€ net)"):
   - currency `#,##0 "€";-#,##0 "€";"–"` (unit prices `#,##0.00 "€"`)
   - counts `#,##0;-#,##0;"–"`, factor `0.0"x"`, percent `0.0%` stored as a fraction (0.19, not 19)
-- **Colour meaning:** inputs blue font `0000FF`, formulas black, assumption inputs light yellow fill `FFF9DB`; totals
-  bold with fill `D9E1F2` and a thin top border (`"borders": {"top": "thin"}`); pros light green `E3F1E6`, cons light
-  red `FBE7E4`; rating text dark green `1B6B2E` or amber `8A6D00`.
+  - years as text (`"2026"`), otherwise they show up as `2,026` in a number column.
+- **Colours come from the CI, everything else stays neutral:** the tools colour the title and header row in the CI
+  colours automatically. Don't add signal colours of your own (no blue, yellow, green or red). Formulas, links and text
+  keep the normal text colour; totals are bold with a thin top border (`"borders": {"top": "thin"}`). Only input and
+  assumption cells get a light fill: `colors.primaryLight` from `get_corporate_ci`, and if the CI provides no colour,
+  neutral grey `F2F2F2`. Pros and cons or ratings get no colour; the column header says what is meant.
 - **Long text:** comments and pros/cons columns wrap (`wrapText` + `verticalAlignment: "top"`; long strings wrap
-  automatically). Column width 40–70, never wider than 70.
+  automatically). Column width 30–50; longer text wraps instead of widening the column.
+- **Freeze panes:** `preset: "report"` freezes only the rows down to the header, and that is usually enough. Freeze a
+  column only if column A is a short row label and the table has more than 8 columns (`"freeze": "B5"`). Never freeze a
+  wide text column or more than one column, otherwise there is hardly any room left to scroll.
 - **Notes and sources** go under the table (`notes`), never as loose rows in the middle of the data.
-- **Chart:** one native chart on the overview for the key comparison (e.g. total cost per scenario) with
-  `show_values`, placed under the table.
+- **Chart** when it makes a comparison clearer (e.g. total cost per scenario): one native chart on the overview with
+  `show_values`, placed under the table. Not every workbook needs one.
+- **Meant to be filled in:** a new workbook that others are to fill in gets a short legend (which cells to fill) and
+  one example row with realistic values. A file you were only asked to edit gets no such row.
 - **Print:** `preset: "report"` turns gridlines off and prints wide tables landscape on one page width; for narrower
   sheets set `options.orientation` / `fit_to_width` yourself if needed.
-- **Check** before you answer: all totals are formulas, no currency cell without a format, the assumptions sheet is
-  referenced, nothing hard-coded.
+
+**Check before you answer:** all totals are formulas, no currency cell without a format, the assumptions sheet is
+referenced, nothing hard-coded. The tools store formulas without a calculated result (Excel calculates on opening), so
+you don't see error values. Check 2–3 formulas against the `layout` in the response, if in doubt with
+`read_excel_detailed`: does every address point to the right row and column? A formula without errors is not
+automatically right; a range shifted by one row calculates the wrong number without any warning.
 
 ## Tool Usage
 
@@ -134,7 +171,7 @@ in **row 4** and the data starts in **row 5**: write every formula with these sh
       ],
       "number_formats": { "B:C": "#,##0 \"€\";-#,##0 \"€\";\"–\"" },
       "cell_styles": {
-        "A7:D7": { "bold": true, "backgroundColor": "D9E1F2", "borders": { "top": "thin" } }
+        "A7:D7": { "bold": true, "borders": { "top": "thin" } }
       },
       "notes": ["Sources: offers of 20 Nov 2026; areas from the floor plan (sheet Assumptions)."],
       "charts": [
@@ -159,12 +196,15 @@ in **row 4** and the data starts in **row 5**: write every formula with these sh
         ["Price offer B (€/m²)", 11.9, "Offer B, 20 Nov 2026"]
       ],
       "number_formats": { "B2:B3": "#,##0;-#,##0;\"–\"", "B4:B5": "#,##0.00 \"€\"" },
-      "cell_styles": { "B2:B5": { "fontColor": "0000FF", "backgroundColor": "FFF9DB" } }
+      "cell_styles": { "B2:B5": { "backgroundColor": "F2F2F2" } }
     }
   ],
   "filename": "cost_comparison"
 }
 ```
+
+The input cells `B2:B5` have a neutral grey fill here; if `get_corporate_ci` returns `colors.primaryLight`, use that
+value (without `#`).
 
 The response contains `layout` per sheet (`headerRow`, `firstDataRow`, `lastDataRow`, `lastColumn`, `notesRows`): use
 these rows for follow-up `modify_excel` calls.
@@ -182,7 +222,7 @@ these rows for follow-up `modify_excel` calls.
 | `cell_styles` | Styles by range, like in `modify_excel` (fill, font colour, bold, alignment, `wrapText`, `indent`, `border`, `borders` per side) |
 | `merge_cells`, `row_heights` | `["A10:D10"]`, `{"5": 58}` (points) |
 | `notes` | Notes/sources under the table, each a merged, wrapped grey row |
-| `options` | `freeze` ("B5"), `show_gridlines`, `orientation`, `fit_to_width`, `print_title_rows` ("4:4"), `tab_color` |
+| `options` | `freeze` ("A5" = rows 1–4 stay visible; "B5" also freezes column A), `show_gridlines`, `orientation`, `fit_to_width`, `print_title_rows` ("4:4"), `tab_color` |
 | `charts` | Native Excel charts that read cells: `type` (`column` = vertical, `bar` = horizontal, `stacked_column`, `line`, `area`, `pie`, `doughnut`), `labels_range`, `data_ranges` (same length, also `'Other sheet'!B5:B8`), `anchor` (top-left cell below the table), optional `title`, `series_names`, `show_values`, `width`/`height` in cm |
 | `table_style` | `"none"` turns off the default table look (borders, zebra rows, wrapped long text) |
 | `column_widths`, `auto_filter`, `protected`, `conditional_formatting` | as before |
@@ -223,16 +263,17 @@ Modifies an existing Excel file. Identify the target with `document_id` (updated
   "librechat_file_id": "<file_id of the attachment>",
   "number_formats": { "Costs!C2:H13": "#,##0 \"€\";-#,##0 \"€\";\"–\"" },
   "cell_styles": {
-    "Costs!A13:H13": { "bold": true, "backgroundColor": "D9E1F2", "borders": { "top": "thin" } },
+    "Costs!A13:H13": { "bold": true, "borders": { "top": "thin" } },
     "Costs!B2:B12": { "wrapText": true, "verticalAlignment": "top" }
   },
   "merge_cells": ["Costs!A15:H15"],
   "row_heights": { "Costs!15": 45 },
-  "sheet_options": { "Costs": { "freeze": "B2", "show_gridlines": false, "orientation": "landscape", "fit_to_width": true } }
+  "sheet_options": { "Costs": { "freeze": "A2", "show_gridlines": false, "orientation": "landscape", "fit_to_width": true } }
 }
 ```
 
-`cell_styles` changes only the given properties; values and the rest of the formatting stay. Existing charts are kept.
+`cell_styles` changes only the given properties; values and the rest of the formatting stay. Existing charts are kept. If the
+file already has a style of its own (colours, fonts, input cells), keep it instead of applying the report look.
 
 ### read_excel
 
@@ -276,14 +317,23 @@ For calculations, filters, group-bys, pivots, statistics or charts on an attache
 The companyFILES tools cover title area, formats, charts and print setup, so prefer `create_excel_advanced`. If you
 still build a workbook with openpyxl (e.g. a chart type the tool lacks), apply the same design rules and:
 
-1. Call `get_corporate_ci` first and use its font and colours.
+1. Call `get_corporate_ci` first and use its font and colours; whatever is listed under `notConfigured` stays neutral
+   (black, greys).
 2. Set `number_format` on **every** numeric cell yourself, formula and total cells included (openpyxl does not inherit
-   formats).
+   formats; a date otherwise shows as `45337`, 30% as `0.3`).
 3. `ws.sheet_view.showGridLines = False`; for wide sheets `ws.page_setup.orientation = "landscape"`,
    `ws.page_setup.fitToWidth = 1`, `ws.page_setup.fitToHeight = 0`, `ws.sheet_properties.pageSetUpPr.fitToPage = True`;
-   freeze under the header (`ws.freeze_panes = "B5"`).
-4. If LibreOffice is available (`soffice`), recalculate before handing the file over so formula results are stored;
-   otherwise say that the values appear after opening in Excel.
+   freeze under the header (`ws.freeze_panes = "A5"`, columns only by the rule above).
+4. Charts: `chart.roundedCorners = False`, `chart.legend.overlay = False` and `.overlay = False` on every title you set
+   (`chart.title`, `chart.x_axis.title` …); for charts with axes (not pie/doughnut) `chart.x_axis.delete = False` and
+   `chart.y_axis.delete = False`. Otherwise Excel may draw the title or legend over the plot, round the frame or hide
+   the axes.
+5. Pitfalls: in merged cells write only the top-left cell. Never save a workbook loaded with `data_only=True`; that
+   replaces every formula with a fixed value. To read formulas *and* values, load twice. Load `.xlsm` with
+   `keep_vba=True`, otherwise the macros are lost.
+6. If LibreOffice is available (`soffice`), recalculate before handing the file over so formula results are stored, and
+   search the result for error values (`#REF!`, `#DIV/0!`, `#NAME?`, `#VALUE!`); never hand over a file with error
+   values. Without LibreOffice, say that the values appear after opening in Excel.
 
 ## Key Notes
 

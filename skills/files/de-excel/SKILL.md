@@ -53,29 +53,72 @@ Wende sie auf jede Arbeitsmappe an, die Menschen lesen, drucken oder weitergeben
 Kostenrechnungen, Management-Zusammenfassungen). Ein reiner Datenexport (`create_excel_from_csv` / `_json`) braucht sie
 nicht.
 
-- **Reihenfolge der Blätter:** Übersicht/Management-Zusammenfassung → Detailblätter → Vergleich / Vor- und Nachteile →
-  Erkenntnisse und nächste Schritte → Annahmen und Quellen.
-- **Titelbereich:** Jedes Blatt bekommt `title` und einen `subtitle` mit Umfang, Stand und Basis („Stand 25.11.2026 ·
-  alle Preise netto“). Den Titel nie in eine Kopfzelle oder eine „Abschnitts“-Zeile in Großbuchstaben schreiben.
-- **Rechnen statt eintippen:** Jeder Parameter steht im **Annahmen-Blatt**, eine beschriftete Zelle je Wert mit
-  Quellenspalte. Formeln beziehen sich absolut darauf (`Annahmen!$B$4`); die Übersicht verweist auf die Detailblätter
-  (`Standorte!G21`). **Tippe nie ein berechnetes Ergebnis ein.** Summen sind `SUM`-Formeln.
+**Was zuerst gilt:**
+
+1. **Vorgaben des Benutzers wörtlich umsetzen:** Blattnamen, Spaltenüberschriften, Reihenfolge und Formeln genau so,
+   wie er sie nennt. Ein schönerer Aufbau, der etwas anderes rechnet, verfehlt die Aufgabe.
+2. **Bestehende Datei: deren Stil hat Vorrang** vor allen Regeln hier. Finde zuerst die Eingabezellen (sie sind meist
+   an eigener Schriftfarbe oder Füllung erkennbar), schreib nur dort und lass vorhandene Formeln unverändert.
+3. **Nur so viel Aufbau, wie der Inhalt braucht.** Eine einfache Liste bekommt Titel, Zahlenformate und Summen, aber
+   kein Annahmen-Blatt und kein Diagramm. Die volle Struktur unten ist für mehrteilige Auswertungen gedacht.
+
+**Aufbau und Rechnen:**
+
+- **Reihenfolge der Blätter** (bei mehrteiligen Auswertungen): Übersicht/Management-Zusammenfassung → Detailblätter →
+  Vergleich / Vor- und Nachteile → Erkenntnisse und nächste Schritte → Annahmen und Quellen. Was es nicht gibt, fällt
+  weg.
+- **Titelbereich:** Jedes Berichtsblatt bekommt `title` und einen `subtitle` mit Umfang, Stand und Basis („Stand
+  25.11.2026 · alle Preise netto“). Den Titel nie in eine Kopfzelle oder eine „Abschnitts“-Zeile in Großbuchstaben
+  schreiben.
+- **Rechnen statt eintippen:** Jeder Parameter steht in einer eigenen beschrifteten Zelle, bei Auswertungen im
+  **Annahmen-Blatt** mit Quellenspalte. Formeln beziehen sich absolut darauf (`Annahmen!$B$4`, nie `B5*1.05`); die
+  Übersicht verweist auf die Detailblätter (`Standorte!G21`). **Tippe nie ein berechnetes Ergebnis ein.** Summen sind
+  `SUM`-Formeln.
+- **Gleiche Formel über die ganze Zeile:** Perioden und Standorte rechnen alle nach demselben Muster. Eine einzeln
+  abweichende Zelle mitten in einer Reihe ist der häufigste unbemerkte Fehler. Nenner, die 0 werden können, fängst du
+  ab (`IFERROR(B5/C5,0)`).
+- **Herkunft jeder festen Zahl:** Jede eingetragene Zahl bekommt eine Quelle dort, wo der Leser sie sieht
+  (Quellenspalte, Notiz oder Zellkommentar). Stammt sie vom Benutzer, schreib das so hin („Angabe des Benutzers“).
+- **Formeln, die überall rechnen:** englische Funktionsnamen und Komma als Trenner (`SUM`, `IF`, `IFERROR`). Bevorzuge
+  bewährte Funktionen wie `SUMIFS`, `INDEX`/`MATCH`, `IFERROR`, `SUMPRODUCT`. **Kein** `XLOOKUP`, `XMATCH`, `FILTER`,
+  `SORT`, `UNIQUE` oder `SEQUENCE`: Ältere Excel-Versionen, LibreOffice und Vorschauen rechnen sie nicht, und
+  Überlauf-Ergebnisse landen nur in der ersten Zelle. Nachschlagen mit `INDEX`/`MATCH`, Sortieren und Filtern erledigst
+  du vorher in den Daten. `TEXTJOIN`, `CONCAT`, `IFS`, `SWITCH`, `MAXIFS` und `MINIFS` gehen nur mit dem Präfix
+  `_xlfn.` (`_xlfn.IFS(…)`), sonst zeigt Excel `#NAME?`.
+- **Blattnamen mit Leerzeichen** stehen in Bezügen in Hochkommas: `'Annahmen 2026'!$B$4` (ohne sie: `#VALUE!`).
+
+**Formate und Aussehen:**
+
 - **Zahlenformat auf jeder Zahlenzelle, auch Formel- und Summenzellen** (sonst zeigt Excel `19380` statt `19.380 €`).
   Die Einheit steht in der Kopfzeile („Kosten (€ netto)“):
   - Währung `#,##0 "€";-#,##0 "€";"–"` (Stückpreise `#,##0.00 "€"`)
   - Anzahlen `#,##0;-#,##0;"–"`, Faktor `0.0"x"`, Prozent `0.0%` als Anteil gespeichert (0,19, nicht 19)
-- **Farbbedeutung:** Eingaben blaue Schrift `0000FF`, Formeln schwarz, Annahmen-Eingaben hellgelb hinterlegt `FFF9DB`;
-  Summen fett mit Füllung `D9E1F2` und dünner Linie oben (`"borders": {"top": "thin"}`); Vorteile hellgrün `E3F1E6`,
-  Nachteile hellrot `FBE7E4`; Bewertungstext dunkelgrün `1B6B2E` oder ocker `8A6D00`.
+  - Jahreszahlen als Text (`"2026"`), sonst erscheinen sie in einer Zahlenspalte als `2.026`.
+- **Farben kommen aus der CI, sonst bleibt alles neutral:** Titel und Kopfzeile färben die Tools automatisch in den
+  CI-Farben. Setz keine eigenen Signalfarben (kein Blau, Gelb, Grün oder Rot). Formeln, Verweise und Texte bleiben in der
+  normalen Textfarbe; Summen sind fett mit dünner Linie oben (`"borders": {"top": "thin"}`). Nur Eingabe- und
+  Annahmenzellen bekommen eine helle Füllung: `colors.primaryLight` aus `get_corporate_ci`, und wenn die CI keine
+  Farbe liefert, neutrales Grau `F2F2F2`. Vor- und Nachteile oder Bewertungen bekommen keine Farbe; die
+  Spaltenüberschrift sagt, was gemeint ist.
 - **Lange Texte:** Bemerkungs- und Vor-/Nachteil-Spalten umbrechen (`wrapText` + `verticalAlignment: "top"`; lange
-  Texte werden automatisch umbrochen). Spaltenbreite 40–70, nie breiter als 70.
+  Texte werden automatisch umbrochen). Spaltenbreite 30–50; was länger ist, wird umbrochen statt breiter.
+- **Fixieren:** `preset: "report"` fixiert nur die Zeilen bis zur Kopfzeile, so bleibt es meist. Eine Spalte fixierst
+  du nur, wenn Spalte A eine kurze Zeilenbeschriftung ist und die Tabelle mehr als 8 Spalten hat (`"freeze": "B5"`).
+  Nie eine breite Textspalte und nie mehr als eine Spalte fixieren, sonst bleibt zum Scrollen kaum Platz.
 - **Notizen und Quellen** stehen unter der Tabelle (`notes`), nie als lose Zeilen mitten in den Daten.
-- **Diagramm:** ein natives Diagramm auf der Übersicht für den wichtigsten Vergleich (z. B. Gesamtkosten je Szenario)
-  mit `show_values`, unter der Tabelle.
+- **Diagramm**, wenn ein Vergleich dadurch klarer wird (z. B. Gesamtkosten je Szenario): ein natives Diagramm auf der
+  Übersicht mit `show_values`, unter der Tabelle. Nicht jede Arbeitsmappe braucht eins.
+- **Zum Ausfüllen gedacht:** Eine neue Arbeitsmappe, die andere ausfüllen sollen, bekommt eine kurze Legende (welche
+  Zellen ausgefüllt werden) und eine Beispielzeile mit realistischen Werten. In eine Datei, die du nur bearbeiten
+  sollst, kommt keine solche Zeile.
 - **Druck:** `preset: "report"` schaltet das Gitternetz ab und druckt breite Tabellen quer auf eine Seitenbreite; für
   schmalere Blätter setz `options.orientation` / `fit_to_width` bei Bedarf selbst.
-- **Prüfe** vor der Antwort: alle Summen sind Formeln, keine Währungszelle ohne Format, das Annahmen-Blatt wird
-  referenziert, nichts ist fest eingetippt.
+
+**Prüfen vor der Antwort:** Alle Summen sind Formeln, keine Währungszelle ohne Format, das Annahmen-Blatt wird
+referenziert, nichts ist fest eingetippt. Die Tools speichern Formeln ohne berechnetes Ergebnis (Excel rechnet beim
+Öffnen), du siehst also keine Fehlerwerte. Prüf deshalb 2–3 Formeln gegen das `layout` der Antwort, bei Zweifel mit
+`read_excel_detailed`: Zeigt jede Adresse auf die richtige Zeile und Spalte? Eine fehlerfreie Formel ist nicht
+automatisch richtig; ein um eine Zeile verschobener Bereich rechnet ohne Warnung falsch.
 
 ## Tool-Verwendung
 
@@ -135,7 +178,7 @@ die Kopfzeile der Tabelle in **Zeile 4**, die Daten beginnen in **Zeile 5**: sch
       ],
       "number_formats": { "B:C": "#,##0 \"€\";-#,##0 \"€\";\"–\"" },
       "cell_styles": {
-        "A7:D7": { "bold": true, "backgroundColor": "D9E1F2", "borders": { "top": "thin" } }
+        "A7:D7": { "bold": true, "borders": { "top": "thin" } }
       },
       "notes": ["Quellen: Angebote vom 20.11.2026; Flächen aus dem Grundriss (Blatt Annahmen)."],
       "charts": [
@@ -160,12 +203,15 @@ die Kopfzeile der Tabelle in **Zeile 4**, die Daten beginnen in **Zeile 5**: sch
         ["Preis Angebot B (€/m²)", 11.9, "Angebot B vom 20.11.2026"]
       ],
       "number_formats": { "B2:B3": "#,##0;-#,##0;\"–\"", "B4:B5": "#,##0.00 \"€\"" },
-      "cell_styles": { "B2:B5": { "fontColor": "0000FF", "backgroundColor": "FFF9DB" } }
+      "cell_styles": { "B2:B5": { "backgroundColor": "F2F2F2" } }
     }
   ],
   "filename": "kostenvergleich"
 }
 ```
+
+Die Eingabezellen `B2:B5` sind hier neutral grau hinterlegt; liefert `get_corporate_ci` ein `colors.primaryLight`,
+nimm diesen Wert (ohne `#`).
 
 Die Antwort enthält je Blatt `layout` (`headerRow`, `firstDataRow`, `lastDataRow`, `lastColumn`, `notesRows`): nimm
 diese Zeilen für folgende `modify_excel`-Aufrufe.
@@ -183,7 +229,7 @@ diese Zeilen für folgende `modify_excel`-Aufrufe.
 | `cell_styles` | Stile nach Bereich wie in `modify_excel` (Füllung, Schriftfarbe, fett, Ausrichtung, `wrapText`, `indent`, `border`, `borders` je Seite) |
 | `merge_cells`, `row_heights` | `["A10:D10"]`, `{"5": 58}` (Punkt) |
 | `notes` | Notizen/Quellen unter der Tabelle, jede als verbundene, umbrochene graue Zeile |
-| `options` | `freeze` ("B5"), `show_gridlines`, `orientation`, `fit_to_width`, `print_title_rows` ("4:4"), `tab_color` |
+| `options` | `freeze` ("A5" = Zeilen 1–4 bleiben stehen; "B5" fixiert zusätzlich Spalte A), `show_gridlines`, `orientation`, `fit_to_width`, `print_title_rows` ("4:4"), `tab_color` |
 | `charts` | Native Excel-Diagramme, die Zellen lesen: `type` (`column` = Säulen, `bar` = Balken, `stacked_column`, `line`, `area`, `pie`, `doughnut`), `labels_range`, `data_ranges` (gleich lang, auch `'Anderes Blatt'!B5:B8`), `anchor` (Zelle oben links unter der Tabelle), optional `title`, `series_names`, `show_values`, `width`/`height` in cm |
 | `table_style` | `"none"` schaltet den Standard-Tabellenlook ab (Rahmen, Zebrastreifen, Umbruch langer Texte) |
 | `column_widths`, `auto_filter`, `protected`, `conditional_formatting` | wie bisher |
@@ -225,17 +271,18 @@ Bearbeitet eine bestehende Excel-Datei. Gib das Ziel mit `document_id` an (wird 
   "librechat_file_id": "<file_id des Anhangs>",
   "number_formats": { "Kosten!C2:H13": "#,##0 \"€\";-#,##0 \"€\";\"–\"" },
   "cell_styles": {
-    "Kosten!A13:H13": { "bold": true, "backgroundColor": "D9E1F2", "borders": { "top": "thin" } },
+    "Kosten!A13:H13": { "bold": true, "borders": { "top": "thin" } },
     "Kosten!B2:B12": { "wrapText": true, "verticalAlignment": "top" }
   },
   "merge_cells": ["Kosten!A15:H15"],
   "row_heights": { "Kosten!15": 45 },
-  "sheet_options": { "Kosten": { "freeze": "B2", "show_gridlines": false, "orientation": "landscape", "fit_to_width": true } }
+  "sheet_options": { "Kosten": { "freeze": "A2", "show_gridlines": false, "orientation": "landscape", "fit_to_width": true } }
 }
 ```
 
 `cell_styles` ändert nur die angegebenen Eigenschaften; Werte und die übrige Formatierung bleiben. Vorhandene
-Diagramme bleiben erhalten.
+Diagramme bleiben erhalten. Hat die Datei schon einen eigenen Stil (Farben, Schriften, Eingabezellen), übernimm ihn statt
+des Berichtslooks.
 
 ### read_excel
 
@@ -280,14 +327,23 @@ Die companyFILES-Tools decken Titelbereich, Formate, Diagramme und Druckeinstell
 `create_excel_advanced`. Baust du trotzdem eine Arbeitsmappe mit openpyxl (z. B. für einen Diagrammtyp, den das Tool
 nicht kennt), gelten dieselben Gestaltungsregeln und:
 
-1. Rufe zuerst `get_corporate_ci` auf und nimm Schrift und Farben daraus.
+1. Rufe zuerst `get_corporate_ci` auf und nimm Schrift und Farben daraus; was unter `notConfigured` steht, bleibt
+   neutral (Schwarz, Grautöne).
 2. Setz `number_format` selbst auf **jede** Zahlenzelle, auch Formel- und Summenzellen (openpyxl übernimmt keine
-   Formate).
+   Formate, ein Datum erscheint sonst als `45337`, 30 % als `0.3`).
 3. `ws.sheet_view.showGridLines = False`; bei breiten Blättern `ws.page_setup.orientation = "landscape"`,
    `ws.page_setup.fitToWidth = 1`, `ws.page_setup.fitToHeight = 0`, `ws.sheet_properties.pageSetUpPr.fitToPage = True`;
-   unter der Kopfzeile fixieren (`ws.freeze_panes = "B5"`).
-4. Ist LibreOffice verfügbar (`soffice`), rechne vor der Übergabe neu, damit die Formelergebnisse gespeichert sind;
-   sonst sag, dass die Werte nach dem Öffnen in Excel erscheinen.
+   unter der Kopfzeile fixieren (`ws.freeze_panes = "A5"`, Spalten nur nach der Regel oben).
+4. Diagramme: `chart.roundedCorners = False`, `chart.legend.overlay = False` und bei jedem gesetzten Titel
+   `.overlay = False` (`chart.title`, `chart.x_axis.title` …); bei Diagrammen mit Achsen (nicht Kreis/Ring)
+   `chart.x_axis.delete = False` und `chart.y_axis.delete = False`. Sonst legt Excel Titel oder Legende über die
+   Fläche, rundet den Rahmen ab oder blendet die Achsen aus.
+5. Stolperfallen: Bei verbundenen Zellen nur die Zelle oben links beschreiben. Eine mit `data_only=True` geladene
+   Mappe nie speichern, das ersetzt alle Formeln durch feste Werte; zum Lesen von Formeln *und* Werten zweimal laden.
+   `.xlsm` mit `keep_vba=True` laden, sonst gehen die Makros verloren.
+6. Ist LibreOffice verfügbar (`soffice`), rechne vor der Übergabe neu, damit die Formelergebnisse gespeichert sind,
+   und such im Ergebnis nach Fehlerwerten (`#REF!`, `#DIV/0!`, `#NAME?`, `#VALUE!`); gib keine Datei mit Fehlerwerten
+   heraus. Ohne LibreOffice sag, dass die Werte erst nach dem Öffnen in Excel erscheinen.
 
 ## Wichtige Hinweise
 
