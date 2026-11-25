@@ -1,6 +1,6 @@
 ---
 name: en-excel
-description: 'Create, read, and modify Excel (.xlsx) spreadsheets with companyFILES MCP tools. Use when asked to create a spreadsheet, export data to Excel, read or parse an Excel file, edit cells, add sheets, apply formulas, conditional formatting, or auto-filters. Covers CSV-to-Excel, JSON-to-Excel, 2D array input, advanced multi-sheet workbooks, in-place modification, and analysing attached spreadsheets.'
+description: 'Create, read, and modify Excel (.xlsx) spreadsheets with companyFILES MCP tools. Use when asked to create a spreadsheet, export data to Excel, build an analysis, comparison, cost calculation or management summary as Excel, read or parse an Excel file, edit cells, add sheets, apply formulas, number formats, conditional formatting, charts or auto-filters. Covers report-quality workbooks (title, assumptions sheet, totals, charts, print setup), CSV-to-Excel, JSON-to-Excel, 2D array input, in-place modification, and analysing attached spreadsheets.'
 ---
 
 # Excel Skill
@@ -16,8 +16,8 @@ Tools for creating, reading, and modifying Excel (.xlsx) spreadsheets via compan
 | `create_excel_from_csv`  | Create Excel from CSV text                                                     |
 | `create_excel`           | Create Excel from a 2D array                                                   |
 | `create_excel_from_json` | Create Excel from JSON (array of objects)                                      |
-| `create_excel_advanced`  | Create multi-sheet workbooks with formulas, validation, conditional formatting |
-| `modify_excel`           | Edit an existing Excel file in-place by document ID                            |
+| `create_excel_advanced`  | Report workbooks: title, multiple sheets, formulas, formats, charts, print setup |
+| `modify_excel`           | Edit an existing Excel file in place (values, formats, merges, sheet options)  |
 | `read_excel`             | Read Excel to JSON (values only)                                               |
 | `read_excel_detailed`    | Read Excel with formulas, comments, hyperlinks, named ranges, and metadata     |
 
@@ -28,7 +28,9 @@ User wants to create Excel from...
   CSV text            → create_excel_from_csv
   JSON array          → create_excel_from_json
   2D array / table    → create_excel
-  Complex workbook    → create_excel_advanced  (formulas, multiple sheets, formatting)
+  Analysis, comparison, calculation, management summary, anything people read or print
+                      → create_excel_advanced with "preset": "report" + title  (see design rules)
+  Complex workbook    → create_excel_advanced  (formulas, multiple sheets, formatting, charts)
 
 User wants to edit an existing Excel file → modify_excel  (requires document_id or librechat_file_id)
 
@@ -44,6 +46,35 @@ User wants calculations / pivots / statistics on an attached sheet
 ## Attached Spreadsheets
 
 A spreadsheet the user attached appears in the `Attached files in this message:` block (`- file_id: …, filename: …`). Pass that `file_id` as `librechat_file_id` to `read_excel`, `read_excel_detailed` or `modify_excel`; use `list_my_files` only if there is no such block. Never guess an ID. For other file tasks and apps, see the **en-file-routing**.
+
+## Design Rules for Report Workbooks
+
+Apply these to every workbook people read, print or pass on (analyses, comparisons, offers, cost calculations,
+management summaries). A plain data export (`create_excel_from_csv` / `_json`) does not need them.
+
+- **Sheet order:** overview/management summary → detail sheets → comparison / pros and cons → findings and next steps →
+  assumptions and sources.
+- **Title area:** every sheet gets `title` and a `subtitle` with scope, date and basis ("As of 25 Nov 2026 · all prices
+  net"). Never put the title into a header cell or an all-caps "section" row.
+- **Calculate, don't type:** put every parameter in an **assumptions sheet**, one labelled cell per value with a source
+  column. Formulas reference it absolutely (`Assumptions!$B$4`); the overview links to the detail sheets
+  (`Sites!G21`). **Never type in a computed result.** Totals are `SUM` formulas.
+- **Number formats on every numeric cell, formula and total cells included** (otherwise Excel shows `19380` instead of
+  `19,380 €`). Put the unit in the header ("Cost (€ net)"):
+  - currency `#,##0 "€";-#,##0 "€";"–"` (unit prices `#,##0.00 "€"`)
+  - counts `#,##0;-#,##0;"–"`, factor `0.0"x"`, percent `0.0%` stored as a fraction (0.19, not 19)
+- **Colour meaning:** inputs blue font `0000FF`, formulas black, assumption inputs light yellow fill `FFF9DB`; totals
+  bold with fill `D9E1F2` and a thin top border (`"borders": {"top": "thin"}`); pros light green `E3F1E6`, cons light
+  red `FBE7E4`; rating text dark green `1B6B2E` or amber `8A6D00`.
+- **Long text:** comments and pros/cons columns wrap (`wrapText` + `verticalAlignment: "top"`; long strings wrap
+  automatically). Column width 40–70, never wider than 70.
+- **Notes and sources** go under the table (`notes`), never as loose rows in the middle of the data.
+- **Chart:** one native chart on the overview for the key comparison (e.g. total cost per scenario) with
+  `show_values`, placed under the table.
+- **Print:** `preset: "report"` turns gridlines off and prints wide tables landscape on one page width; for narrower
+  sheets set `options.orientation` / `fit_to_width` yourself if needed.
+- **Check** before you answer: all totals are formulas, no currency cell without a format, the assumptions sheet is
+  referenced, nothing hard-coded.
 
 ## Tool Usage
 
@@ -82,37 +113,86 @@ A spreadsheet the user attached appears in the `Attached files in this message:`
 
 ### create_excel_advanced
 
+Report example with two sheets: an overview that calculates from an assumptions sheet, totals as formulas, currency
+formats on every numeric cell (formula and total cells included), a note and a chart. With `title` the table header is
+in **row 4** and the data starts in **row 5**: write every formula with these sheet rows.
+
 ```json
 {
   "sheets": [
     {
-      "name": "Sales",
-      "data": [
-        ["Product", "Q1", "Q2", "Total"],
-        ["Widget A", 100, 150, { "formula": "SUM(B2:C2)" }],
-        ["Widget B", 200, 180, { "formula": "SUM(B3:C3)" }]
-      ],
+      "name": "Overview",
+      "preset": "report",
+      "title": "Cost comparison of sites",
+      "subtitle": "As of 25 Nov 2026 · all prices net",
       "has_headers": true,
-      "auto_filter": true,
-      "conditional_formatting": [
+      "data": [
+        ["Site", "Offer A (€)", "Offer B (€)", "Comment"],
+        ["North", { "formula": "Assumptions!$B$2*Assumptions!$B$4" }, { "formula": "Assumptions!$B$2*Assumptions!$B$5" }, "Offer B includes on-site installation and training"],
+        ["South", { "formula": "Assumptions!$B$3*Assumptions!$B$4" }, { "formula": "Assumptions!$B$3*Assumptions!$B$5" }, "same scope"],
+        ["Total", { "formula": "SUM(B5:B6)" }, { "formula": "SUM(C5:C6)" }, ""]
+      ],
+      "number_formats": { "B:C": "#,##0 \"€\";-#,##0 \"€\";\"–\"" },
+      "cell_styles": {
+        "A7:D7": { "bold": true, "backgroundColor": "D9E1F2", "borders": { "top": "thin" } }
+      },
+      "notes": ["Sources: offers of 20 Nov 2026; areas from the floor plan (sheet Assumptions)."],
+      "charts": [
         {
-          "range": "B2:C3",
-          "type": "greaterThan",
-          "values": [150],
-          "style": { "backgroundColor": "00FF00" }
+          "type": "column",
+          "title": "Cost per site",
+          "labels_range": "A5:A6",
+          "data_ranges": ["B5:B6", "C5:C6"],
+          "anchor": "A11",
+          "show_values": true
         }
       ]
+    },
+    {
+      "name": "Assumptions",
+      "has_headers": true,
+      "data": [
+        ["Parameter", "Value", "Source"],
+        ["Area North (m²)", 1200, "Floor plan"],
+        ["Area South (m²)", 800, "Floor plan"],
+        ["Price offer A (€/m²)", 12.5, "Offer A, 20 Nov 2026"],
+        ["Price offer B (€/m²)", 11.9, "Offer B, 20 Nov 2026"]
+      ],
+      "number_formats": { "B2:B3": "#,##0;-#,##0;\"–\"", "B4:B5": "#,##0.00 \"€\"" },
+      "cell_styles": { "B2:B5": { "fontColor": "0000FF", "backgroundColor": "FFF9DB" } }
     }
   ],
-  "filename": "sales_report"
+  "filename": "cost_comparison"
 }
 ```
 
+The response contains `layout` per sheet (`headerRow`, `firstDataRow`, `lastDataRow`, `lastColumn`, `notesRows`): use
+these rows for follow-up `modify_excel` calls.
+
 **Formula syntax:** Use `{"formula": "SUM(A1:A10)"}` object — no leading `=`.
+
+**Per-sheet options:**
+
+| Option | Effect |
+| --- | --- |
+| `title`, `subtitle` | Title in row 1 (bold, CI colour), grey subtitle in row 2; data starts at row 4 |
+| `has_headers` / `header_row` | First data row is the table header (row 4 with a title); `header_row` = sheet row of the header when `data` has rows above it |
+| `preset` | `"report"`: gridlines off, freeze and print titles at the header, landscape and fit to page width above 8 columns. `"data"`: plain table |
+| `number_formats` | `{"C5:H14": "…"}` or whole columns `{"C:H": "…"}` (= the data rows incl. totals) |
+| `cell_styles` | Styles by range, like in `modify_excel` (fill, font colour, bold, alignment, `wrapText`, `indent`, `border`, `borders` per side) |
+| `merge_cells`, `row_heights` | `["A10:D10"]`, `{"5": 58}` (points) |
+| `notes` | Notes/sources under the table, each a merged, wrapped grey row |
+| `options` | `freeze` ("B5"), `show_gridlines`, `orientation`, `fit_to_width`, `print_title_rows` ("4:4"), `tab_color` |
+| `charts` | Native Excel charts that read cells: `type` (`column` = vertical, `bar` = horizontal, `stacked_column`, `line`, `area`, `pie`, `doughnut`), `labels_range`, `data_ranges` (same length, also `'Other sheet'!B5:B8`), `anchor` (top-left cell below the table), optional `title`, `series_names`, `show_values`, `width`/`height` in cm |
+| `table_style` | `"none"` turns off the default table look (borders, zebra rows, wrapped long text) |
+| `column_widths`, `auto_filter`, `protected`, `conditional_formatting` | as before |
+
+Without `column_widths`, columns are sized from the content (max. 60; longer text wraps and the row gets taller). A
+formula cell without a number format takes the format of its column when all numbers there share one.
 
 **Conditional formatting types:** `greaterThan`, `lessThan`, `equal`, `between`, `containsText`, `duplicateValues`
 
-**Other per-sheet options:** `column_widths` (number array), `protected` (boolean). Top-level: `named_ranges` and `properties` (`{title, subject, author, company}`). Individual cells may also be extended objects: `{"value": ..., "comment": ..., "validation": ..., "style": ..., "numberFormat": ...}`. Such an object needs `value` (plus at least one of the other keys); a formula goes **inside** `value`, not next to it: `{"value": {"formula": "SUM(A1:A3)"}, "comment": "Total"}`. A `formula` key beside `value` and `comment` is ignored; an object without `value` (e.g. `{"formula": …, "comment": …}`) is written as a plain formula and its other keys are dropped.
+**Other options:** top-level `named_ranges` and `properties` (`{title, subject, author, company}`). Individual cells may also be extended objects: `{"value": ..., "comment": ..., "validation": ..., "style": ..., "numberFormat": ...}`. Such an object needs `value` (plus at least one of the other keys); a formula goes **inside** `value`, not next to it: `{"value": {"formula": "SUM(A1:A3)"}, "comment": "Total"}`. A `formula` key beside `value` and `comment` is ignored; an object without `value` (e.g. `{"formula": …, "comment": …}`) is written as a plain formula and its other keys are dropped. For many cells, prefer the range options (`number_formats`, `cell_styles`) over per-cell objects: they cost far fewer tokens.
 
 ### modify_excel
 
@@ -135,6 +215,24 @@ Modifies an existing Excel file. Identify the target with `document_id` (updated
   "rename_sheets": { "OldName": "NewName" }
 }
 ```
+
+**Formatting an existing sheet into the report look** — one call with ranges instead of per-cell objects:
+
+```json
+{
+  "librechat_file_id": "<file_id of the attachment>",
+  "number_formats": { "Costs!C2:H13": "#,##0 \"€\";-#,##0 \"€\";\"–\"" },
+  "cell_styles": {
+    "Costs!A13:H13": { "bold": true, "backgroundColor": "D9E1F2", "borders": { "top": "thin" } },
+    "Costs!B2:B12": { "wrapText": true, "verticalAlignment": "top" }
+  },
+  "merge_cells": ["Costs!A15:H15"],
+  "row_heights": { "Costs!15": 45 },
+  "sheet_options": { "Costs": { "freeze": "B2", "show_gridlines": false, "orientation": "landscape", "fit_to_width": true } }
+}
+```
+
+`cell_styles` changes only the given properties; values and the rest of the formatting stay. Existing charts are kept.
 
 ### read_excel
 
@@ -173,11 +271,26 @@ For calculations, filters, group-bys, pivots, statistics or charts on an attache
 
 **Fallback without code execution:** `read_excel { "librechat_file_id": "<file_id>" }` (per sheet with `sheet_name` for large workbooks), compute from the returned values step by step and show your intermediate figures. For a chart use `show_interactive_chart` / `create_chart_document` (**charts-diagram-skill**). If the file is too large to read completely, say so and analyse a named sheet or range.
 
+### Building the workbook in the sandbox yourself
+
+The companyFILES tools cover title area, formats, charts and print setup, so prefer `create_excel_advanced`. If you
+still build a workbook with openpyxl (e.g. a chart type the tool lacks), apply the same design rules and:
+
+1. Call `get_corporate_ci` first and use its font and colours.
+2. Set `number_format` on **every** numeric cell yourself, formula and total cells included (openpyxl does not inherit
+   formats).
+3. `ws.sheet_view.showGridLines = False`; for wide sheets `ws.page_setup.orientation = "landscape"`,
+   `ws.page_setup.fitToWidth = 1`, `ws.page_setup.fitToHeight = 0`, `ws.sheet_properties.pageSetUpPr.fitToPage = True`;
+   freeze under the header (`ws.freeze_panes = "B5"`).
+4. If LibreOffice is available (`soffice`), recalculate before handing the file over so formula results are stored;
+   otherwise say that the values appear after opening in Excel.
+
 ## Key Notes
 
 - All create tools return `{id, filename, downloadUrl, markdownLink}` (plus `librechat_file_id` when the document is also stored as a chat file) — always render `markdownLink` in the reply.
 - `modify_excel` requires a `document_id` or `librechat_file_id` pointing to an `.xlsx` file; it errors if the doc type is not Excel. A chat attachment (`librechat_file_id`) is updated in place when possible — the response then contains `librechat_file_id`, `filename`, `modifications` and `message`, but no download link. Otherwise the modified copy is saved as a new document with a new `id` and `markdownLink`.
 - Sheet names must match the workbook — call `read_excel` first to see them; an unknown name errors with the available sheets.
+- Ranges in `number_formats`, `cell_styles`, `merge_cells` and `row_heights` use sheet rows. With a `title`, the header is row 4; check the `layout` in the create response.
 - Cell addresses support sheet prefix: `"Sheet2!B3"`.
 - The org/user CI is applied automatically when configured in settings: colours, font, page size and orientation, header/footer with page numbers, and the company name in the file properties. Excel gets no logo.
 - To fill a template with `{{placeholder}}` syntax, use `fill_excel_template` from the **en-templates** instead.
