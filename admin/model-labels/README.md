@@ -4,47 +4,107 @@ Curated display names and short descriptions for every chat model deployed in co
 "Claude Sonnet 5.5 – Programming, writing and demanding everyday work" instead of a bare model id like
 `claude-sonnet-5-5`.
 
-| File | Language |
-| --- | --- |
-| [`de.yaml`](de.yaml) | German labels and descriptions |
-| [`en.yaml`](en.yaml) | English labels and descriptions |
+Everything lives in one file, [`labels.yaml`](labels.yaml) (format v2): structure (groups, order, menu
+recommendation, successors, aliases, endpoint preference) once, and label and description per language. It replaces
+the former `de.yaml` / `en.yaml`.
 
-companyGPT shows one label per model, not one per user language, so pick the file that matches your users. Both
-files list the same models in the same order; only `label` and `description` are translated.
-
-## Format
+## Format v2
 
 ```yaml
-labels:
-  - model: claude-sonnet-5-5          # model id as companyGPT knows it
-    label: Claude Sonnet 5.5          # what the model picker shows
-    group: Anthropic                  # submenu in the picker
-    groupIcon: anthropic              # icon of that submenu
-    description: Programming, writing and demanding everyday work
+version: 2                          # required; other values are rejected
+locales: [de, en]                   # every label/description must carry each listed locale
+groups:                             # order = order of first appearance for new labels
+  - id: openai                      # referenced by models[].group
+    label: OpenAI                   # string, or { de: …, en: … }
+    icon: openAI                    # provider name (LibreChat built-in icon) or https:// URL; optional
+models:
+  - model: gpt-6.1-sol              # canonical model id; unique across model ids and aliases
+    group: openai
+    menu: featured                  # featured | available; default available
+    supersededBy: []                # model ids from this file; acyclic
+    aliases: [gpt-61-sol]           # other deployment ids that mean this model; optional
+    endpoints: [openAI, azureOpenAI]   # endpoint preference when offered on several; optional
+    label: { de: GPT-6.1 Sol, en: GPT-6.1 Sol }
+    description: { de: "Stärkstes GPT: …", en: "Strongest GPT: …" }
 ```
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `version` | yes | Always `2`. |
+| `locales` | yes | Languages of the file. Every `label` and `description` map carries exactly these keys. |
+| `groups[].id` | yes | Key that `models[].group` refers to; unique. |
+| `groups[].label` | yes | Submenu name in the model picker: one string for all languages, or a map per locale. |
+| `groups[].icon` | no | Icon of the submenu, see [Group icons](#group-icons). |
+| `models[].model` | yes | Canonical model id as companyGPT knows it. Unique across all model ids **and** aliases. |
+| `models[].group` | yes | `id` of a group in this file. |
+| `models[].menu` | no | `featured` or `available` (default), see [Menu recommendation](#menu-recommendation). |
+| `models[].supersededBy` | no | Model ids from this file that replace this model, see [Successors](#successors). |
+| `models[].aliases` | no | Other deployment ids that mean the same model, see [Aliases](#aliases). |
+| `models[].endpoints` | no | Endpoint preference, see [Endpoint preference](#endpoint-preference). |
+| `models[].label` | yes | Map per locale: what the model picker shows. 1–128 characters, no control characters. |
+| `models[].description` | no | Map per locale: one line for the user, at most 120 characters. |
+
+Unknown keys are rejected everywhere, so a typo fails validation instead of being ignored. The order of `groups`
+is the order of the submenus; the order of `models` is the order inside a submenu.
 
 The descriptions are written from the user's point of view: what a model is good for, so people can choose
 without knowing the model family. Where the provider publishes a short description, it is the basis.
 
+### Menu recommendation
+
+`menu` says whether a model should be offered prominently in the picker:
+
+- `featured`: the newest generation of each model family (e.g. GPT-6.1 Sol, Claude Opus 5.5, Gemini 3.8 Flash)
+  and the `auto*` router entries.
+- `available` (default): older generations and everything else. They still work and keep their label; they are
+  just not recommended for the menu.
+
+When a new generation arrives, set it to `featured` and the model it replaces to `available` with `supersededBy`.
+
+### Successors
+
+`supersededBy` lists the model(s) that replace an older one, normally the current `featured` model of the same
+family and tier (GPT-5.6 Sol → GPT-6.1 Sol, Claude Opus 4.8 → Claude Opus 5.5, Gemini 3.1 Pro (Preview) → Gemini 4
+Argon). Older GPT-5.x/4.x models point to the GPT-6 tier that fits their role: full and Codex models to Sol,
+chat-style and non-reasoning all-rounders to Terra, mini/nano and o3-mini to Luna. Entries must be model ids of this
+file (not aliases), and following them may never lead back to the same model. Models without a newer model of the
+same family in the file have no `supersededBy`.
+
+### Aliases
+
+Some providers deploy the same model under another id, e.g. Bedrock's `anthropic.claude-opus-4-8` for
+`claude-opus-4-8`. Such ids go into `aliases` of the canonical entry instead of a second, identical entry, so the
+label and description exist once. An id can only be either a model id or an alias of one model.
+
+### Endpoint preference
+
+Where one model is offered on several endpoints in an environment (e.g. `openAI` and `azureOpenAI`), `endpoints`
+lists them in order of preference, so the label sync knows which one to show. Leave it out when the model is only
+offered on one endpoint or there is no preference; none of today's entries sets it.
+
 ## Applying the labels
 
-Labels are maintained by hand in **companyADMIN → Configuration → Labels** (`/config/labels`):
+Tenants apply the labels through the **companyADMIN label sync**, which reads `admin/model-labels/labels.yaml` from
+this repo. It adds labels only for models the environment actually has, in the users' language, and uses `menu`,
+`supersededBy`, `aliases` and `endpoints` as described above. Users only see the labels of models their role
+allows.
 
-1. The page lists the models of the environment that have no label yet. For each one, look up its `model` in the
-   file for your language and copy **label**, **description**, **group** and **group icon**.
-2. Only add labels for models the environment actually has. The files cover every model deployed anywhere in the
-   fleet, so most environments use only part of them.
+Copying by hand in **companyADMIN → Configuration → Labels** (`/config/labels`) is only the fallback, e.g. where the
+label sync is not available yet:
+
+1. The page lists the models of the environment that have no label yet. Look up the model in `labels.yaml` (as
+   `model` or under `aliases`) and copy the **label** and **description** of your users' language, plus the
+   group's **label** and **icon**.
+2. Only add labels for models the environment actually has. The file covers every model deployed anywhere in the
+   fleet, so most environments use only part of it.
 3. For GPT models on the `openAI` / `azureOpenAI` endpoint, keep the **Responses API** switch as it is in the
    environment (it is on where the GPT models run through the AI gateway).
 
-Users only see the labels of models their role allows.
-
 ### Group icons
 
-The picker shows one icon per group, taken from the first label of the group that has one. Every entry carries its
-group's icon anyway, so it does not matter which one you enter first.
+Each group has one icon (`groups[].icon`). Keep them as below; they are what the tenants already use.
 
-| Group | `groupIcon` | |
+| Group | `icon` | |
 | --- | --- | --- |
 | Auto, OpenAI | `openAI` | LibreChat's built-in OpenAI icon (as on groku/schoenklinik, where Auto sits in the OpenAI group) |
 | Anthropic | `anthropic` | built-in |
@@ -68,9 +128,13 @@ loaded as an image URL. The bucket `compangygpt-public-data/misc/` also has `goo
 ## Maintaining the list
 
 - When a model is deployed for the first time (`companyGPT/env/<tenant>/config.tfvars` or `librechat.yaml`), add
-  it to both files in the same PR. Retired models can stay until no environment has them any more.
-- Keep `de.yaml` and `en.yaml` in the same order with the same `model` and `group`; `npm run validate` checks it.
-- Descriptions: one line, at most 120 characters, no prices or cost hints.
+  it to `labels.yaml` in the same PR, with label and description in every locale. Retired models can stay until no
+  environment has them any more.
+- A new generation: mark it `featured`, set the older model to `available` and point its `supersededBy` at it.
+- Descriptions: one line, at most 120 characters, no prices or cost hints. Labels: at most 128 characters.
+- `npm run validate` checks the file: `version` 2, unique model ids and aliases, known groups, known and acyclic
+  successors, every locale text present, label and description limits, no unknown keys. `npm test` runs the
+  validator's self-test.
 
 ## Sources
 

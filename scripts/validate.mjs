@@ -3,12 +3,13 @@
 //
 //   skills/<category>/<locale>-<id>/SKILL.md   name == folder, locale prefix, both locales, listed under <category>
 //   agents/<locale>-<slug>.md                  agent markdown: id agent_<locale>_<slug>, skills/subagents within the locale
-//   admin/model-labels/<locale>.yaml           same models and groups in every locale
+//   admin/model-labels/labels.yaml             label file v2 (scripts/model-labels.mjs)
 //
 // Usage: npm run validate
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parse } from 'yaml';
+import { validateModelLabels } from './model-labels.mjs';
 
 const LOCALES = ['de', 'en'];
 const NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
@@ -122,42 +123,28 @@ for (const { rel, L, a } of agents) {
 	}
 }
 
-// admin/model-labels/
-const labelModels = {};
+// admin/model-labels/ (label file v2, one file for every locale; see admin/model-labels/README.md)
+const LABELS = 'admin/model-labels/labels.yaml';
+let labelCount = 0;
 for (const L of LOCALES) {
-	const rel = `admin/model-labels/${L}.yaml`;
-	if (!existsSync(join(root, rel))) {
-		fail(`${rel}: missing`);
-		continue;
-	}
+	if (existsSync(join(root, `admin/model-labels/${L}.yaml`))) fail(`admin/model-labels/${L}.yaml: v1 label files are replaced by ${LABELS}`);
+}
+if (!existsSync(join(root, LABELS))) fail(`${LABELS}: missing`);
+else {
 	let doc;
 	try {
-		doc = parse(read(rel));
+		doc = parse(read(LABELS));
 	} catch (e) {
-		fail(`${rel}: not valid YAML (${e.message.split('\n')[0]})`);
-		continue;
+		fail(`${LABELS}: not valid YAML (${e.message.split('\n')[0]})`);
 	}
-	const list = doc?.labels;
-	if (!Array.isArray(list)) {
-		fail(`${rel}: needs a labels list`);
-		continue;
+	if (doc !== undefined) {
+		for (const e of validateModelLabels(doc, LABELS)) fail(e);
+		labelCount = Array.isArray(doc?.models) ? doc.models.length : 0;
 	}
-	const models = new Set();
-	const groupIcons = {};
-	for (const l of list) {
-		for (const key of ['model', 'label', 'group', 'groupIcon', 'description']) if (!l?.[key]) fail(`${rel}: ${l?.model || '?'} needs ${key}`);
-		if (l?.group && groupIcons[l.group] && groupIcons[l.group] !== l.groupIcon) fail(`${rel}: ${l.model} has another groupIcon than the rest of group ${l.group}`);
-		if (l?.group) groupIcons[l.group] ??= l.groupIcon;
-		if (String(l?.description || '').length > 120) fail(`${rel}: ${l.model} description longer than 120 characters`);
-		if (models.has(l?.model)) fail(`${rel}: ${l.model} is listed twice`);
-		models.add(l?.model);
-	}
-	labelModels[L] = list.map((l) => `${l?.model}@${l?.group}@${l?.groupIcon}`).join(',');
 }
-if (labelModels.de && labelModels.en && labelModels.de !== labelModels.en) fail('admin/model-labels: de.yaml and en.yaml must list the same models (and groups, group icons) in the same order');
 
 if (errors.length) {
 	console.error(`validate: ${errors.length} problem(s):\n  - ${errors.join('\n  - ')}`);
 	process.exit(1);
 }
-console.log(`validate: ${skillNames.size} skills, ${agents.length} agents, ${LOCALES.length} model label lists OK`);
+console.log(`validate: ${skillNames.size} skills, ${agents.length} agents, model labels (${labelCount} models) OK`);

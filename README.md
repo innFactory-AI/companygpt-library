@@ -16,7 +16,7 @@ catalog.json                                 # skill categories, order, docs ind
 skills/<category>/<locale>-<id>/SKILL.md     # one skill per language: skills/files/de-excel, skills/files/en-excel
 skills/<category>/<locale>-<id>/references/  # optional bundled files (part of the skill package)
 agents/<locale>-<slug>.md                    # ready-made agents (CompanyGPT, CompanyGPT Researcher) per language
-admin/model-labels/                          # curated model labels per language (entered in companyADMIN)
+admin/model-labels/labels.yaml               # curated model labels, all languages (companyADMIN label sync)
 ```
 
 Skill names carry the language as a prefix (`de-excel`, `en-excel`), so both languages can be installed in the
