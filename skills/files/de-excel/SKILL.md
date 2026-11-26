@@ -29,7 +29,7 @@ Benutzer will Excel erstellen aus...
   JSON-Array            → create_excel_from_json
   2D-Array / Tabelle    → create_excel
   Auswertung, Vergleich, Kalkulation, Management-Zusammenfassung, alles zum Lesen oder Drucken
-                        → create_excel_advanced mit "preset": "report" + Titel  (siehe Gestaltungsregeln)
+                        → create_excel_advanced mit "preset": "report" + Titel + Diagramm  (siehe Gestaltungsregeln)
   Komplexe Arbeitsmappe → create_excel_advanced  (Formeln, mehrere Blätter, Formatierung, Diagramme)
 
 Benutzer will eine bestehende Excel-Datei bearbeiten → modify_excel  (benötigt document_id oder librechat_file_id)
@@ -60,7 +60,7 @@ nicht.
 2. **Bestehende Datei: deren Stil hat Vorrang** vor allen Regeln hier. Finde zuerst die Eingabezellen (sie sind meist
    an eigener Schriftfarbe oder Füllung erkennbar), schreib nur dort und lass vorhandene Formeln unverändert.
 3. **Nur so viel Aufbau, wie der Inhalt braucht.** Eine einfache Liste bekommt Titel, Zahlenformate und Summen, aber
-   kein Annahmen-Blatt und kein Diagramm. Die volle Struktur unten ist für mehrteilige Auswertungen gedacht.
+   kein Annahmen-Blatt. Die volle Struktur unten ist für mehrteilige Auswertungen gedacht.
 
 **Aufbau und Rechnen:**
 
@@ -106,11 +106,13 @@ nicht.
   du nur, wenn Spalte A eine kurze Zeilenbeschriftung ist und die Tabelle mehr als 8 Spalten hat (`"freeze": "B5"`).
   Nie eine breite Textspalte und nie mehr als eine Spalte fixieren, sonst bleibt zum Scrollen kaum Platz.
 - **Notizen und Quellen** stehen unter der Tabelle (`notes`), nie als lose Zeilen mitten in den Daten.
-- **Diagramm**, wenn ein Vergleich dadurch klarer wird (z. B. Gesamtkosten je Szenario): ein natives Diagramm auf der
-  Übersicht, unter der Tabelle. Nicht jede Arbeitsmappe braucht eins. Halte es schlicht: höchstens 2–3 Reihen, kurze
-  Kategorienamen, ein knapper Titel. **Werte an den Balken (`show_values`) nur bei wenigen Balken** (bis etwa 8
-  insgesamt, also Reihen × Kategorien); bei mehr sind die Zahlen in der Tabelle und die Beschriftungen überlappen nur.
-  Eine Beschriftung zeigt nur den Wert, ohne Reihen- oder Kategorienamen.
+- **Diagramm – Pflicht bei Vergleichen:** Jeder Vergleich, jede Kostenrechnung, jedes Szenario und jede Zeitreihe
+  bekommt ein natives Diagramm (`charts`) auf der Übersicht, unter der Tabelle, für die wichtigste Aussage (z. B.
+  Kosten je Standort und Angebot). Ohne Diagramm bleiben nur reine Listen, Datenexporte und Vorlagen zum Ausfüllen.
+  Halte es schlicht: höchstens 2–3 Reihen, kurze Kategorienamen, ein knapper Titel.
+- **Werte an den Balken (`show_values`) nur bei wenigen Balken** (bis etwa 8 insgesamt, also Reihen × Kategorien). Bei
+  mehr baust du das Diagramm trotzdem, nur ohne `show_values`: Die Zahlen stehen in der Tabelle, die Beschriftungen
+  würden sich überlappen. Eine Beschriftung zeigt nur den Wert, ohne Reihen- oder Kategorienamen.
 - **Zum Ausfüllen gedacht:** Eine neue Arbeitsmappe, die andere ausfüllen sollen, bekommt eine kurze Legende (welche
   Zellen ausgefüllt werden) und eine Beispielzeile mit realistischen Werten. In eine Datei, die du nur bearbeiten
   sollst, kommt keine solche Zeile.
@@ -118,7 +120,7 @@ nicht.
   schmalere Blätter setz `options.orientation` / `fit_to_width` bei Bedarf selbst.
 
 **Prüfen vor der Antwort:** Alle Summen sind Formeln, keine Währungszelle ohne Format, das Annahmen-Blatt wird
-referenziert, nichts ist fest eingetippt. Die Tools speichern Formeln ohne berechnetes Ergebnis (Excel rechnet beim
+referenziert, nichts ist fest eingetippt, ein Vergleich hat sein Diagramm. Die Tools speichern Formeln ohne berechnetes Ergebnis (Excel rechnet beim
 Öffnen), du siehst also keine Fehlerwerte. Prüf deshalb 2–3 Formeln gegen das `layout` der Antwort, bei Zweifel mit
 `read_excel_detailed`: Zeigt jede Adresse auf die richtige Zeile und Spalte? Eine fehlerfreie Formel ist nicht
 automatisch richtig; ein um eine Zeile verschobener Bereich rechnet ohne Warnung falsch.

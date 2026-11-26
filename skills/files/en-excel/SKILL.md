@@ -29,7 +29,7 @@ User wants to create Excel from...
   JSON array          → create_excel_from_json
   2D array / table    → create_excel
   Analysis, comparison, calculation, management summary, anything people read or print
-                      → create_excel_advanced with "preset": "report" + title  (see design rules)
+                      → create_excel_advanced with "preset": "report" + title + chart  (see design rules)
   Complex workbook    → create_excel_advanced  (formulas, multiple sheets, formatting, charts)
 
 User wants to edit an existing Excel file → modify_excel  (requires document_id or librechat_file_id)
@@ -59,7 +59,7 @@ management summaries). A plain data export (`create_excel_from_csv` / `_json`) d
 2. **Existing file: its own style wins** over every rule here. Find the input cells first (they usually stand out by
    their own font colour or fill), write only there and leave existing formulas unchanged.
 3. **Only as much structure as the content needs.** A simple list gets a title, number formats and totals, but no
-   assumptions sheet and no chart. The full structure below is meant for multi-part analyses.
+   assumptions sheet. The full structure below is meant for multi-part analyses.
 
 **Structure and calculation:**
 
@@ -100,18 +100,20 @@ management summaries). A plain data export (`create_excel_from_csv` / `_json`) d
   column only if column A is a short row label and the table has more than 8 columns (`"freeze": "B5"`). Never freeze a
   wide text column or more than one column, otherwise there is hardly any room left to scroll.
 - **Notes and sources** go under the table (`notes`), never as loose rows in the middle of the data.
-- **Chart** when it makes a comparison clearer (e.g. total cost per scenario): one native chart on the overview,
-  placed under the table. Not every workbook needs one. Keep it plain: at most 2–3 series, short category names, a
-  brief title. **Values on the bars (`show_values`) only with few bars** (up to about 8 in total, i.e. series ×
-  categories); with more, the numbers are in the table anyway and the labels only overlap. A label shows the value
-  only, without series or category name.
+- **Chart, required for comparisons:** every comparison, cost calculation, scenario and time series gets one native
+  chart (`charts`) on the overview, placed under the table, for the key message (e.g. cost per site and offer). Only
+  plain lists, data exports and fill-in templates go without one. Keep it plain: at most 2–3 series, short category
+  names, a brief title.
+- **Values on the bars (`show_values`) only with few bars** (up to about 8 in total, i.e. series × categories). With
+  more, still build the chart, just without `show_values`: the numbers are in the table and the labels would overlap.
+  A label shows the value only, without series or category name.
 - **Meant to be filled in:** a new workbook that others are to fill in gets a short legend (which cells to fill) and
   one example row with realistic values. A file you were only asked to edit gets no such row.
 - **Print:** `preset: "report"` turns gridlines off and prints wide tables landscape on one page width; for narrower
   sheets set `options.orientation` / `fit_to_width` yourself if needed.
 
 **Check before you answer:** all totals are formulas, no currency cell without a format, the assumptions sheet is
-referenced, nothing hard-coded. The tools store formulas without a calculated result (Excel calculates on opening), so
+referenced, nothing hard-coded, a comparison has its chart. The tools store formulas without a calculated result (Excel calculates on opening), so
 you don't see error values. Check 2–3 formulas against the `layout` in the response, if in doubt with
 `read_excel_detailed`: does every address point to the right row and column? A formula without errors is not
 automatically right; a range shifted by one row calculates the wrong number without any warning.
