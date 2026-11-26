@@ -107,7 +107,10 @@ nicht.
   Nie eine breite Textspalte und nie mehr als eine Spalte fixieren, sonst bleibt zum Scrollen kaum Platz.
 - **Notizen und Quellen** stehen unter der Tabelle (`notes`), nie als lose Zeilen mitten in den Daten.
 - **Diagramm**, wenn ein Vergleich dadurch klarer wird (z. B. Gesamtkosten je Szenario): ein natives Diagramm auf der
-  Übersicht mit `show_values`, unter der Tabelle. Nicht jede Arbeitsmappe braucht eins.
+  Übersicht, unter der Tabelle. Nicht jede Arbeitsmappe braucht eins. Halte es schlicht: höchstens 2–3 Reihen, kurze
+  Kategorienamen, ein knapper Titel. **Werte an den Balken (`show_values`) nur bei wenigen Balken** (bis etwa 8
+  insgesamt, also Reihen × Kategorien); bei mehr sind die Zahlen in der Tabelle und die Beschriftungen überlappen nur.
+  Eine Beschriftung zeigt nur den Wert, ohne Reihen- oder Kategorienamen.
 - **Zum Ausfüllen gedacht:** Eine neue Arbeitsmappe, die andere ausfüllen sollen, bekommt eine kurze Legende (welche
   Zellen ausgefüllt werden) und eine Beispielzeile mit realistischen Werten. In eine Datei, die du nur bearbeiten
   sollst, kommt keine solche Zeile.
@@ -337,7 +340,12 @@ nicht kennt), gelten dieselben Gestaltungsregeln und:
 4. Diagramme: `chart.roundedCorners = False`, `chart.legend.overlay = False` und bei jedem gesetzten Titel
    `.overlay = False` (`chart.title`, `chart.x_axis.title` …); bei Diagrammen mit Achsen (nicht Kreis/Ring)
    `chart.x_axis.delete = False` und `chart.y_axis.delete = False`. Sonst legt Excel Titel oder Legende über die
-   Fläche, rundet den Rahmen ab oder blendet die Achsen aus.
+   Fläche, rundet den Rahmen ab oder blendet die Achsen aus. Datenbeschriftungen (nur bei wenigen Balken, siehe oben)
+   immer vollständig angeben, denn fehlende Schalter liest Excel als „an“ und schreibt dann Reihe, Kategorie und
+   Legendensymbol an jeden Balken:
+   `DataLabelList(showVal=True, showSerName=False, showCatName=False, showLegendKey=False, showPercent=False,
+   dLblPos="outEnd")` (bei Kreis/Ring ohne `dLblPos`), dazu `chart.dataLabels.numFmt = '#,##0 "€"'` ohne
+   Nachkommastellen.
 5. Stolperfallen: Bei verbundenen Zellen nur die Zelle oben links beschreiben. Eine mit `data_only=True` geladene
    Mappe nie speichern, das ersetzt alle Formeln durch feste Werte; zum Lesen von Formeln *und* Werten zweimal laden.
    `.xlsm` mit `keep_vba=True` laden, sonst gehen die Makros verloren.

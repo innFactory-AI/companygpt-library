@@ -100,8 +100,11 @@ management summaries). A plain data export (`create_excel_from_csv` / `_json`) d
   column only if column A is a short row label and the table has more than 8 columns (`"freeze": "B5"`). Never freeze a
   wide text column or more than one column, otherwise there is hardly any room left to scroll.
 - **Notes and sources** go under the table (`notes`), never as loose rows in the middle of the data.
-- **Chart** when it makes a comparison clearer (e.g. total cost per scenario): one native chart on the overview with
-  `show_values`, placed under the table. Not every workbook needs one.
+- **Chart** when it makes a comparison clearer (e.g. total cost per scenario): one native chart on the overview,
+  placed under the table. Not every workbook needs one. Keep it plain: at most 2–3 series, short category names, a
+  brief title. **Values on the bars (`show_values`) only with few bars** (up to about 8 in total, i.e. series ×
+  categories); with more, the numbers are in the table anyway and the labels only overlap. A label shows the value
+  only, without series or category name.
 - **Meant to be filled in:** a new workbook that others are to fill in gets a short legend (which cells to fill) and
   one example row with realistic values. A file you were only asked to edit gets no such row.
 - **Print:** `preset: "report"` turns gridlines off and prints wide tables landscape on one page width; for narrower
@@ -327,7 +330,11 @@ still build a workbook with openpyxl (e.g. a chart type the tool lacks), apply t
 4. Charts: `chart.roundedCorners = False`, `chart.legend.overlay = False` and `.overlay = False` on every title you set
    (`chart.title`, `chart.x_axis.title` …); for charts with axes (not pie/doughnut) `chart.x_axis.delete = False` and
    `chart.y_axis.delete = False`. Otherwise Excel may draw the title or legend over the plot, round the frame or hide
-   the axes.
+   the axes. Always spell out data labels in full (only with few bars, see above): Excel reads a missing switch as
+   "on" and then writes series, category and legend key next to every bar:
+   `DataLabelList(showVal=True, showSerName=False, showCatName=False, showLegendKey=False, showPercent=False,
+   dLblPos="outEnd")` (pie/doughnut without `dLblPos`), plus `chart.dataLabels.numFmt = '#,##0 "€"'` without
+   decimals.
 5. Pitfalls: in merged cells write only the top-left cell. Never save a workbook loaded with `data_only=True`; that
    replaces every formula with a fixed value. To read formulas *and* values, load twice. Load `.xlsm` with
    `keep_vba=True`, otherwise the macros are lost.
