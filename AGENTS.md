@@ -94,6 +94,9 @@ holds a label and user-facing description per locale, the group, the menu recomm
 every chat model deployed anywhere in the fleet. Tenants apply it through the companyADMIN label sync (hand copying in
 companyADMIN → Configuration → Labels is only the fallback). Keep the file path stable: tenants use it as their label
 source. A newly deployed chat model gets its entry in the same rollout; the README describes the format.
+**Format changes:** the tenants' companyADMIN rejects unknown keys in the label file (the whole file, not just the
+entry). Use a new key here only after a companyADMIN version that knows it runs fleet-wide; otherwise bump `version`,
+and companyADMIN must support the new version first.
 
 ## Writing rules
 

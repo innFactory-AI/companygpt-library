@@ -47,6 +47,12 @@ models:
 Unknown keys are rejected everywhere, so a typo fails validation instead of being ignored. The order of `groups`
 is the order of the submenus; the order of `models` is the order inside a submenu.
 
+### Format changes
+
+The tenants' companyADMIN rejects unknown keys too, and then applies none of the file. So a new key may only be
+used in `labels.yaml` once a companyADMIN version that knows it runs fleet-wide. Otherwise bump `version`; companyADMIN
+must support the new version first.
+
 The descriptions are written from the user's point of view: what a model is good for, so people can choose
 without knowing the model family. Where the provider publishes a short description, it is the basis.
 
