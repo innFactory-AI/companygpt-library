@@ -9,7 +9,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parse } from 'yaml';
-import { validateModelLabels } from './model-labels.mjs';
+import { MAX_FILE_CHARS, validateModelLabels } from './model-labels.mjs';
 
 const LOCALES = ['de', 'en'];
 const NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
@@ -132,10 +132,14 @@ for (const L of LOCALES) {
 if (!existsSync(join(root, LABELS))) fail(`${LABELS}: missing`);
 else {
 	let doc;
-	try {
-		doc = parse(read(LABELS));
-	} catch (e) {
-		fail(`${LABELS}: not valid YAML (${e.message.split('\n')[0]})`);
+	const text = read(LABELS);
+	if (text.length > MAX_FILE_CHARS) fail(`${LABELS}: longer than ${MAX_FILE_CHARS} characters`);
+	else {
+		try {
+			doc = parse(text);
+		} catch (e) {
+			fail(`${LABELS}: not valid YAML (${e.message.split('\n')[0]})`);
+		}
 	}
 	if (doc !== undefined) {
 		for (const e of validateModelLabels(doc, LABELS)) fail(e);

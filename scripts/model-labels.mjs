@@ -6,14 +6,21 @@
 //   groups:  [{ id, label, icon? }]
 //   models:  [{ model, group, menu?, supersededBy?, aliases?, endpoints?, label, description? }]
 //
-// Unknown keys are rejected everywhere (strict).
+// Unknown keys are rejected everywhere (strict). The rules mirror the tenant-side reader in companyADMIN
+// (src/services/label-file.ts, `validate`), so a file that passes here is accepted by every tenant. The one intended
+// difference: descriptions are one line of at most 120 characters here (README rule), the reader allows 512.
 
 const TOP_KEYS = ['version', 'locales', 'groups', 'models'];
 const GROUP_KEYS = ['id', 'label', 'icon'];
 const MODEL_KEYS = ['model', 'group', 'menu', 'supersededBy', 'aliases', 'endpoints', 'label', 'description'];
 const MENU = ['featured', 'available'];
 const LOCALE_RE = /^[a-z]{2}(-[A-Z]{2})?$/;
-const LABEL_MAX = 128;
+const LABEL_MAX = 128; // also the limit for model ids
+const ICON_MAX = 512;
+const PROVIDER_ICON_RE = /^[A-Za-z][A-Za-z0-9_.-]{0,127}$/;
+const HTTPS_ICON_RE = /^https:\/\/[^\s]+$/;
+/** The reader rejects larger files before parsing; validate.mjs applies it to the raw text. */
+export const MAX_FILE_CHARS = 1_000_000;
 const DESCRIPTION_MAX = 120; // README rule (one line); the format itself would allow 512
 // eslint-disable-next-line no-control-regex
 const CONTROL_RE = /[\u0000-\u001f\u007f-\u009f]/;
@@ -34,14 +41,15 @@ export function validateModelLabels(doc, rel) {
 	strict('', doc, TOP_KEYS);
 	if (doc.version !== 2) fail('', `version must be 2 (is ${JSON.stringify(doc.version)})`);
 
-	const locales = Array.isArray(doc.locales) ? doc.locales : [];
-	if (!locales.length || locales.some((L) => typeof L !== 'string' || !LOCALE_RE.test(L)) || new Set(locales).size !== locales.length) {
+	// Like the reader: a list with any non-string entry counts as no locales at all.
+	const locales = Array.isArray(doc.locales) && doc.locales.every((L) => typeof L === 'string') ? doc.locales : [];
+	if (!locales.length || locales.some((L) => !LOCALE_RE.test(L)) || new Set(locales).size !== locales.length) {
 		fail('', `locales must be a non-empty list of unique locale codes such as [de, en] (is ${JSON.stringify(doc.locales)})`);
 	}
 
 	// One text value: labels 1–128 characters without control characters, descriptions at most 120 characters.
 	const text = (where, name, value, field) => {
-		if (value === undefined) return fail(where, `${name} is missing`);
+		if (value === undefined || value === null) return fail(where, `${name} is missing`);
 		if (typeof value !== 'string') return fail(where, `${name} must be a string`);
 		if (field === 'label') {
 			if (!value.trim()) fail(where, `${name} is empty`);
@@ -62,7 +70,7 @@ export function validateModelLabels(doc, rel) {
 	if (!Array.isArray(doc.groups)) fail('', 'groups must be a list');
 	const groups = Array.isArray(doc.groups) ? doc.groups : [];
 	for (const [i, g] of groups.entries()) {
-		const where = `groups[${isObject(g) && typeof g.id === 'string' ? g.id : i}]`;
+		const where = `groups[${isObject(g) && typeof g.id === 'string' && g.id ? g.id : i}]`;
 		if (!isObject(g)) {
 			fail(where, 'must be a mapping');
 			continue;
@@ -74,7 +82,12 @@ export function validateModelLabels(doc, rel) {
 		if (typeof g.label === 'string') text(where, 'label', g.label, 'label');
 		else if (g.label === undefined) fail(where, 'label is required (a string or a map with every locale)');
 		else texts(where, 'label', g.label);
-		if (g.icon !== undefined && (typeof g.icon !== 'string' || !g.icon)) fail(where, 'icon must be a non-empty string (provider name or https:// URL)');
+		if (
+			g.icon !== undefined &&
+			!(typeof g.icon === 'string' && g.icon.length <= ICON_MAX && (PROVIDER_ICON_RE.test(g.icon) || HTTPS_ICON_RE.test(g.icon)))
+		) {
+			fail(where, `icon must be a provider icon name or an https:// URL of at most ${ICON_MAX} characters`);
+		}
 	}
 
 	// Optional list of non-empty strings.
@@ -104,7 +117,9 @@ export function validateModelLabels(doc, rel) {
 		}
 		strict(where, m, MODEL_KEYS);
 		if (typeof m.model !== 'string' || !m.model) fail(where, 'model must be a non-empty string');
-		else claim(where, m.model);
+		else if (m.model.length > LABEL_MAX || CONTROL_RE.test(m.model)) {
+			fail(where, `model must have at most ${LABEL_MAX} characters without control characters`);
+		} else claim(where, m.model);
 		for (const alias of list(where, 'aliases', m.aliases)) claim(where, alias);
 		const endpoints = list(where, 'endpoints', m.endpoints);
 		for (const [j, e] of endpoints.entries()) if (endpoints.indexOf(e) !== j) fail(where, `endpoints lists "${e}" twice`);

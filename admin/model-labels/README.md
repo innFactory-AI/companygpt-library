@@ -35,7 +35,7 @@ models:
 | `groups[].id` | yes | Key that `models[].group` refers to; unique. |
 | `groups[].label` | yes | Submenu name in the model picker: one string for all languages, or a map per locale. |
 | `groups[].icon` | no | Icon of the submenu, see [Group icons](#group-icons). |
-| `models[].model` | yes | Canonical model id as companyGPT knows it. Unique across all model ids **and** aliases. |
+| `models[].model` | yes | Canonical model id as companyGPT knows it, at most 128 characters, no control characters. Unique across all model ids **and** aliases. |
 | `models[].group` | yes | `id` of a group in this file. |
 | `models[].menu` | no | `featured` or `available` (default), see [Menu recommendation](#menu-recommendation). |
 | `models[].supersededBy` | no | Model ids from this file that replace this model, see [Successors](#successors). |
@@ -113,8 +113,10 @@ Each group has one icon (`groups[].icon`). Keep them as below; they are what the
 | Perplexity | `perplexity` | built-in |
 | STACKIT | `https://storage.googleapis.com/compangygpt-public-data/misc/stackit-icon.svg` | no built-in icon; the icon the tenants' STACKIT endpoint already uses |
 
-A provider name (any case, also aliases like `claude`, `gemini`) becomes LibreChat's built-in icon; anything else is
-loaded as an image URL. The bucket `compangygpt-public-data/misc/` also has `google-icon.svg` and
+An `icon` is either a provider icon name (a letter, then up to 127 letters, digits, `_`, `.` or `-`, e.g. `openAI`;
+any case, also aliases like `claude`, `gemini`), which becomes LibreChat's built-in icon, or an `https://` URL
+without spaces, at most 512 characters, which is loaded as an image. Anything else (`http://`, spaces, …) fails
+validation, and companyADMIN rejects the file. The bucket `compangygpt-public-data/misc/` also has `google-icon.svg` and
 `perplexity-icon.svg` if a tenant prefers the endpoint icons.
 
 ## What is not in the list
@@ -133,7 +135,8 @@ loaded as an image URL. The bucket `compangygpt-public-data/misc/` also has `goo
 - A new generation: mark it `featured`, set the older model to `available` and point its `supersededBy` at it.
 - Descriptions: one line, at most 120 characters, no prices or cost hints. Labels: at most 128 characters.
 - `npm run validate` checks the file: `version` 2, unique model ids and aliases, known groups, known and acyclic
-  successors, every locale text present, label and description limits, no unknown keys. `npm test` runs the
+  successors, every locale text present, label, description, model id and icon rules, no unknown keys (the same rules
+  as the companyADMIN label sync, except that companyADMIN allows descriptions up to 512 characters). `npm test` runs the
   validator's self-test.
 
 ## Sources

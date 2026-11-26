@@ -156,6 +156,54 @@ test('a group icon must be a non-empty string', () => {
 	assertFails(d, 'groups[openai]: icon');
 });
 
+test('a group icon must be a provider icon name or an https:// URL of at most 512 characters', () => {
+	for (const bad of ['http://example.com/x.svg', 'open AI', 'https://example.com/a b.svg', '1password', '-x', 'x'.repeat(129), 5, `https://example.com/${'x'.repeat(493)}`]) {
+		const d = validDoc();
+		d.groups[0].icon = bad;
+		assertFails(d, 'groups[openai]: icon');
+	}
+	for (const ok of ['openAI', 'claude', 'a_b.c-d', 'x'.repeat(128), `https://example.com/${'x'.repeat(492)}`]) {
+		const d = validDoc();
+		d.groups[0].icon = ok;
+		assert.deepEqual(errorsOf(d), [], `icon ${JSON.stringify(ok)} should pass`);
+	}
+});
+
+test('an empty group id is reported by index', () => {
+	const d = validDoc();
+	d.groups[0].id = '';
+	assertFails(d, 'groups[0]: id must be a non-empty string');
+});
+
+test('a model id of 128 characters passes, 129 is rejected', () => {
+	const ok = validDoc();
+	ok.models[2].model = 'm'.repeat(128);
+	assert.deepEqual(errorsOf(ok), []);
+	const d = validDoc();
+	d.models[2].model = 'm'.repeat(129);
+	assertFails(d, `${'m'.repeat(129)}: model must have at most 128 characters`);
+});
+
+test('a model id with control characters is rejected', () => {
+	for (const bad of ['gpt\n6', 'gpt\t6', 'gpt\u00006', 'gpt\u00856']) {
+		const d = validDoc();
+		d.models[2].model = bad;
+		assertFails(d, 'model must have at most 128 characters without control characters');
+	}
+});
+
+test('a null text counts as missing', () => {
+	const d = validDoc();
+	d.models[1].label.en = null;
+	assertFails(d, 'gpt-6-sol: label.en is missing');
+});
+
+test('locales with a non-string entry are treated as no locales (every text key is unknown)', () => {
+	const d = validDoc();
+	d.locales = ['de', 'en', 1];
+	assertFails(d, 'locales', 'gpt-6-sol: label: unknown key "de"');
+});
+
 test('an unknown successor is rejected', () => {
 	const d = validDoc();
 	d.models[1].supersededBy = ['gpt-7'];
@@ -330,6 +378,14 @@ test('npm run validate rejects leftover v1 files and a missing labels.yaml', (t)
 	assert.equal(r.status, 1);
 	assert.match(r.stderr, /admin\/model-labels\/de\.yaml: v1 label files are replaced/);
 	assert.match(r.stderr, /admin\/model-labels\/labels\.yaml: missing/);
+});
+
+test('npm run validate rejects a label file over 1,000,000 characters', (t) => {
+	const root = fixtureRoot({ 'labels.yaml': `${stringify(validDoc())}#${'x'.repeat(1_000_000)}\n` });
+	t.after(() => rmSync(root, { recursive: true, force: true }));
+	const r = runValidate(root);
+	assert.equal(r.status, 1);
+	assert.match(r.stderr, /labels\.yaml: longer than 1000000 characters/);
 });
 
 test('npm run validate reports invalid YAML', (t) => {
