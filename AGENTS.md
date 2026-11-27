@@ -18,8 +18,9 @@ catalog.json                                  # skill categories, order (by <id>
 skills/<category>/<locale>-<id>/SKILL.md      # the skill: what users upload in companyGPT under "Skills"
 skills/<category>/<locale>-<id>/references/…  # optional bundled files (Markdown recipes; optionally scripts/…)
 agents/<locale>-<slug>.md                     # ready-made companyGPT agents (agent markdown)
-admin/model-labels/<locale>.yaml              # curated model labels for companyADMIN, README.md explains them
-scripts/validate.mjs                          # `npm run validate`, runs in CI
+admin/model-labels/labels.yaml                # curated model labels (format v2) for companyADMIN, README.md explains them
+scripts/validate.mjs                          # `npm run validate`, runs in CI (label file v2: scripts/model-labels.mjs,
+                                              # self-test `npm test`)
 ```
 
 - `<locale>` is `de` or `en`. **The locale is part of every name**, so both languages can live in one companyGPT:
@@ -88,12 +89,14 @@ locale.
 
 ### admin/
 
-Admin defaults that are not synced automatically; an admin applies them by hand. They are not multilingual in
-companyGPT yet, so each has one file per locale side by side, plus a `README.md`. `admin/model-labels/` holds
-a label, group and user-facing description for every chat model deployed anywhere in the fleet; admins enter them
-by hand in companyADMIN → Configuration → Labels. Keep `de.yaml` and `en.yaml` on the same models and groups in the
-same order; only `label`/`description` are translated. A newly deployed chat model gets its entry in the same
-rollout.
+Admin defaults for companyADMIN, each folder with a `README.md`. `admin/model-labels/labels.yaml` (label file v2)
+holds a label and user-facing description per locale, the group, the menu recommendation, successors and aliases for
+every chat model deployed anywhere in the fleet. Tenants apply it through the companyADMIN label sync (hand copying in
+companyADMIN → Configuration → Labels is only the fallback). Keep the file path stable: tenants use it as their label
+source. A newly deployed chat model gets its entry in the same rollout; the README describes the format.
+**Format changes:** the tenants' companyADMIN rejects unknown keys in the label file (the whole file, not just the
+entry). Use a new key here only after a companyADMIN version that knows it runs fleet-wide; otherwise bump `version`,
+and companyADMIN must support the new version first.
 
 ## Writing rules
 
